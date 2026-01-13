@@ -1,0 +1,92 @@
+Name,API Name,Memory,vCPUs,Network Performance,Redis Cost,Redis Reserved Cost,Memcached On Demand Cost,Memcached Reserved Cost,Valkey On Demand Cost,Valkey Reserved Cost
+M6g General Purpose Graviton Double Extra Large,cache.m6g.2xlarge,26.04 GiB,8 vCPUs,Up to 10 Gigabit,$0.5930 hourly,$0.4050 hourly,$0.5930 hourly,$0.4050 hourly,$0.4744 hourly,$0.3240 hourly
+M6g General Purpose Graviton 16xlarge,cache.m6g.16xlarge,209.55 GiB,64 vCPUs,25 Gigabit,$4.7430 hourly,$3.2370 hourly,$4.7430 hourly,$3.2370 hourly,$3.7944 hourly,$2.5896 hourly
+R6g Memory optimized Eight Extra Large,cache.r6g.8xlarge,209.55 GiB,32 vCPUs,12 Gigabit,$3.2840 hourly,$2.2410 hourly,$3.2840 hourly,$2.2410 hourly,$2.6272 hourly,$1.7928 hourly
+R7G Quadruple Extra Large,cache.r7g.4xlarge,105.81 GiB,16 vCPUs,Up to 15 Gigabit,$1.7450 hourly,$1.1870 hourly,$1.7450 hourly,$1.1870 hourly,$1.3960 hourly,$0.9496 hourly
+M5 General Purpose Double Extra Large,cache.m5.2xlarge,26.04 GiB,8 vCPUs,Up to 10 Gigabit,$0.6230 hourly,$0.4260 hourly,$0.6230 hourly,$0.4260 hourly,$0.4984 hourly,$0.3408 hourly
+R5 Memory optimized 12xlarge,cache.r5.12xlarge,317.77 GiB,48 vCPUs,10 Gigabit,$5.1840 hourly,$3.5380 hourly,$5.1840 hourly,$3.5380 hourly,$4.1472 hourly,$2.8304 hourly
+R6g Memory optimized Large,cache.r6g.large,13.07 GiB,2 vCPUs,Up to 10 Gigabit,$0.2060 hourly,$0.1410 hourly,$0.2060 hourly,$0.1410 hourly,$0.1648 hourly,$0.1128 hourly
+M6g General Purpose Graviton Extra Large,cache.m6g.xlarge,12.93 GiB,4 vCPUs,Up to 10 Gigabit,$0.2970 hourly,$0.2030 hourly,$0.2970 hourly,$0.2030 hourly,$0.2376 hourly,$0.1624 hourly
+R6g Memory optimized Quadruple Extra Large,cache.r6g.4xlarge,105.81 GiB,16 vCPUs,Up to 10 Gigabit,$1.6420 hourly,$1.1210 hourly,$1.6420 hourly,$1.1210 hourly,$1.3136 hourly,$0.8968 hourly
+M1 Previous generation: (not recommended) Medium,cache.m1.medium,3.35 GiB,1 vCPUs,Moderate,$0.1120 hourly,unavailable,$0.1120 hourly,unavailable,$0.0896 hourly,unavailable
+R5 Memory optimized Large,cache.r5.large,13.07 GiB,2 vCPUs,Up to 10 Gigabit,$0.2160 hourly,$0.1470 hourly,$0.2160 hourly,$0.1470 hourly,$0.1728 hourly,$0.1176 hourly
+M1 Previous generation: (not recommended) Extra Large,cache.m1.xlarge,14.6 GiB,4 vCPUs,High,$0.4530 hourly,unavailable,$0.4530 hourly,unavailable,$0.3624 hourly,unavailable
+R4 Memory optimized Extra Large,cache.r4.xlarge,25.05 GiB,4 vCPUs,Up to 10 Gigabit,$0.4550 hourly,unavailable,$0.4550 hourly,unavailable,$0.3640 hourly,unavailable
+T3 General Purpose Micro,cache.t3.micro,0.5 GiB,2 vCPUs,Up to 5 Gigabit,$0.0170 hourly,$0.0120 hourly,$0.0170 hourly,$0.0120 hourly,$0.0136 hourly,$0.0096 hourly
+T1 Previous generation: (not recommended) Micro,cache.t1.micro,0.213 GiB,1 vCPUs,Very Low,$0.0220 hourly,unavailable,$0.0220 hourly,unavailable,$0.0176 hourly,unavailable
+R6g Memory optimized Double Extra Large,cache.r6g.2xlarge,52.82 GiB,8 vCPUs,Up to 10 Gigabit,$0.8210 hourly,$0.5610 hourly,$0.8210 hourly,$0.5610 hourly,$0.6568 hourly,$0.4488 hourly
+R6gd Memory optimized (SSD storage) Extra Large,cache.r6gd.xlarge,26.32 GiB,4 vCPUs,Up to 10 Gigabit,$0.7810 hourly,$0.5310 hourly,unavailable,unavailable,$0.6248 hourly,$0.4248 hourly
+M7G Extra Large,cache.m7g.xlarge,12.93 GiB,4 vCPUs,Up to 12.5 Gigabit,$0.3150 hourly,$0.2140 hourly,$0.3150 hourly,$0.2140 hourly,$0.2520 hourly,$0.1712 hourly
+M6g General Purpose Graviton 12xlarge,cache.m6g.12xlarge,157.12 GiB,48 vCPUs,20 Gigabit,$3.5570 hourly,$2.4280 hourly,$3.5570 hourly,$2.4280 hourly,$2.8456 hourly,$1.9424 hourly
+T2 General Purpose Medium,cache.t2.medium,3.22 GiB,2 vCPUs,Low to Moderate,$0.0680 hourly,unavailable,$0.0680 hourly,unavailable,$0.0544 hourly,unavailable
+T3 General Purpose Small,cache.t3.small,1.37 GiB,2 vCPUs,Up to 5 Gigabit,$0.0340 hourly,$0.0230 hourly,$0.0340 hourly,$0.0230 hourly,$0.0272 hourly,$0.0184 hourly
+T2 General Purpose Small,cache.t2.small,1.55 GiB,1 vCPUs,Low to Moderate,$0.0340 hourly,unavailable,$0.0340 hourly,unavailable,$0.0272 hourly,unavailable
+M6g General Purpose Graviton Quadruple Extra Large,cache.m6g.4xlarge,52.26 GiB,16 vCPUs,Up to 10 Gigabit,$1.1860 hourly,$0.8100 hourly,$1.1860 hourly,$0.8100 hourly,$0.9488 hourly,$0.6480 hourly
+M6g General Purpose Graviton Eight Extra Large,cache.m6g.8xlarge,103.68 GiB,32 vCPUs,12 Gigabit,$2.3720 hourly,$1.6190 hourly,$2.3720 hourly,$1.6190 hourly,$1.8976 hourly,$1.2952 hourly
+M5 General Purpose Large,cache.m5.large,6.38 GiB,2 vCPUs,Up to 10 Gigabit,$0.1560 hourly,$0.1060 hourly,$0.1560 hourly,$0.1060 hourly,$0.1248 hourly,$0.0848 hourly
+M4 General Purpose Extra Large,cache.m4.xlarge,14.28 GiB,4 vCPUs,High,$0.3110 hourly,unavailable,$0.3110 hourly,unavailable,$0.2488 hourly,unavailable
+M6g General Purpose Graviton Large,cache.m6g.large,6.38 GiB,2 vCPUs,Up to 10 Gigabit,$0.1490 hourly,$0.1020 hourly,$0.1490 hourly,$0.1020 hourly,$0.1192 hourly,$0.0816 hourly
+M3 Previous generation: (not recommended) Large,cache.m3.large,6.05 GiB,2 vCPUs,Moderate,$0.1820 hourly,unavailable,$0.1820 hourly,unavailable,$0.1456 hourly,unavailable
+R5 Memory optimized 24xlarge,cache.r5.24xlarge,635.61 GiB,96 vCPUs,25 Gigabit,$10.3680 hourly,$7.0760 hourly,$10.3680 hourly,$7.0760 hourly,$8.2944 hourly,$5.6608 hourly
+M7G 16xlarge,cache.m7g.16xlarge,209.55 GiB,64 vCPUs,30 Gigabit,$5.0280 hourly,$3.4190 hourly,$5.0280 hourly,$3.4190 hourly,$4.0224 hourly,$2.7352 hourly
+R3 Memory optimized (not recommended) Quadruple Extra Large,cache.r3.4xlarge,118 GiB,16 vCPUs,High,$1.8200 hourly,unavailable,$1.8200 hourly,unavailable,$1.4560 hourly,unavailable
+M5 General Purpose Extra Large,cache.m5.xlarge,12.93 GiB,4 vCPUs,Up to 10 Gigabit,$0.3110 hourly,$0.2130 hourly,$0.3110 hourly,$0.2130 hourly,$0.2488 hourly,$0.1704 hourly
+R3 Memory optimized (not recommended) Extra Large,cache.r3.xlarge,28.4 GiB,4 vCPUs,Moderate,$0.4550 hourly,unavailable,$0.4550 hourly,unavailable,$0.3640 hourly,unavailable
+T2 General Purpose Micro,cache.t2.micro,0.555 GiB,1 vCPUs,Low to Moderate,$0.0170 hourly,unavailable,$0.0170 hourly,unavailable,$0.0136 hourly,unavailable
+R7G Eight Extra Large,cache.r7g.8xlarge,209.55 GiB,32 vCPUs,15 Gigabit,$3.4910 hourly,$2.3740 hourly,$3.4910 hourly,$2.3740 hourly,$2.7928 hourly,$1.8992 hourly
+R7G Double Extra Large,cache.r7g.2xlarge,52.82 GiB,8 vCPUs,Up to 15 Gigabit,$0.8730 hourly,$0.5940 hourly,$0.8730 hourly,$0.5940 hourly,$0.6984 hourly,$0.4752 hourly
+M5 General Purpose Quadruple Extra Large,cache.m5.4xlarge,52.26 GiB,16 vCPUs,Up to 10 Gigabit,$1.2450 hourly,$0.8520 hourly,$1.2450 hourly,$0.8520 hourly,$0.9960 hourly,$0.6816 hourly
+R3 Memory optimized (not recommended) Large,cache.r3.large,13.5 GiB,2 vCPUs,Moderate,$0.2280 hourly,unavailable,$0.2280 hourly,unavailable,$0.1824 hourly,unavailable
+R5 Memory optimized Quadruple Extra Large,cache.r5.4xlarge,105.81 GiB,16 vCPUs,Up to 10 Gigabit,$1.7240 hourly,$1.1790 hourly,$1.7240 hourly,$1.1790 hourly,$1.3792 hourly,$0.9432 hourly
+T4g General Purpose Graviton Micro,cache.t4g.micro,0.5 GiB,2 vCPUs,Up to 5 Gigabit,$0.0160 hourly,$0.0110 hourly,$0.0160 hourly,$0.0110 hourly,$0.0128 hourly,$0.0088 hourly
+M2 General Purpose Extra Large,cache.m2.xlarge,16.7 GiB,2 vCPUs,Moderate,$0.3020 hourly,unavailable,$0.3020 hourly,unavailable,$0.2416 hourly,unavailable
+R7G 16xlarge,cache.r7g.16xlarge,419.09 GiB,64 vCPUs,30 Gigabit,$6.9810 hourly,$4.7470 hourly,$6.9810 hourly,$4.7470 hourly,$5.5848 hourly,$3.7976 hourly
+R6g Memory optimized 16xlarge,cache.r6g.16xlarge,419.09 GiB,64 vCPUs,25 Gigabit,$6.5670 hourly,$4.4820 hourly,$6.5670 hourly,$4.4820 hourly,$5.2536 hourly,$3.5856 hourly
+R4 Memory optimized Double Extra Large,cache.r4.2xlarge,50.47 GiB,8 vCPUs,Up to 10 Gigabit,$0.9100 hourly,unavailable,$0.9100 hourly,unavailable,$0.7280 hourly,unavailable
+R7G 12xlarge,cache.r7g.12xlarge,317.77 GiB,48 vCPUs,22.5 Gigabit,$5.2350 hourly,$3.5600 hourly,$5.2350 hourly,$3.5600 hourly,$4.1880 hourly,$2.8480 hourly
+M7G Large,cache.m7g.large,6.38 GiB,2 vCPUs,Up to 12.5 Gigabit,$0.1580 hourly,$0.1070 hourly,$0.1580 hourly,$0.1070 hourly,$0.1264 hourly,$0.0856 hourly
+M4 General Purpose Large,cache.m4.large,6.42 GiB,2 vCPUs,Moderate,$0.1560 hourly,unavailable,$0.1560 hourly,unavailable,$0.1248 hourly,unavailable
+M5 General Purpose 24xlarge,cache.m5.24xlarge,314.32 GiB,96 vCPUs,25 Gigabit,$7.4880 hourly,$5.1110 hourly,$7.4880 hourly,$5.1110 hourly,$5.9904 hourly,$4.0888 hourly
+M4 General Purpose Quadruple Extra Large,cache.m4.4xlarge,60.78 GiB,16 vCPUs,High,$1.2450 hourly,unavailable,$1.2450 hourly,unavailable,$0.9960 hourly,unavailable
+R4 Memory optimized 16xlarge,cache.r4.16xlarge,407 GiB,64 vCPUs,25 Gigabit,$7.2800 hourly,unavailable,$7.2800 hourly,unavailable,$5.8240 hourly,unavailable
+M7G Quadruple Extra Large,cache.m7g.4xlarge,52.26 GiB,16 vCPUs,Up to 15 Gigabit,$1.2570 hourly,$0.8550 hourly,$1.2570 hourly,$0.8550 hourly,$1.0056 hourly,$0.6840 hourly
+T4g General Purpose Graviton Small,cache.t4g.small,1.37 GiB,2 vCPUs,Up to 5 Gigabit,$0.0320 hourly,$0.0220 hourly,$0.0320 hourly,$0.0220 hourly,$0.0256 hourly,$0.0176 hourly
+M5 General Purpose 12xlarge,cache.m5.12xlarge,157.12 GiB,48 vCPUs,10 Gigabit,$3.7440 hourly,$2.5550 hourly,$3.7440 hourly,$2.5550 hourly,$2.9952 hourly,$2.0440 hourly
+R4 Memory optimized Quadruple Extra Large,cache.r4.4xlarge,101.38 GiB,16 vCPUs,Up to 10 Gigabit,$1.8200 hourly,unavailable,$1.8200 hourly,unavailable,$1.4560 hourly,unavailable
+T3 General Purpose Medium,cache.t3.medium,3.09 GiB,2 vCPUs,Up to 5 Gigabit,$0.0680 hourly,$0.0460 hourly,$0.0680 hourly,$0.0460 hourly,$0.0544 hourly,$0.0368 hourly
+R3 Memory optimized (not recommended) Double Extra Large,cache.r3.2xlarge,58.2 GiB,8 vCPUs,High,$0.9100 hourly,unavailable,$0.9100 hourly,unavailable,$0.7280 hourly,unavailable
+R7G Extra Large,cache.r7g.xlarge,26.32 GiB,4 vCPUs,Up to 12.5 Gigabit,$0.4370 hourly,$0.2970 hourly,$0.4370 hourly,$0.2970 hourly,$0.3496 hourly,$0.2376 hourly
+R4 Memory optimized Large,cache.r4.large,12.3 GiB,2 vCPUs,Up to 10 Gigabit,$0.2280 hourly,unavailable,$0.2280 hourly,unavailable,$0.1824 hourly,unavailable
+C7GN Quadruple Extra Large,cache.c7gn.4xlarge,26.05 GiB,16 vCPUs,50 Gigabit,$2.0370 hourly,$1.3850 hourly,$2.0370 hourly,$1.3850 hourly,$1.6296 hourly,$1.1080 hourly
+R6g Memory optimized Extra Large,cache.r6g.xlarge,26.32 GiB,4 vCPUs,Up to 10 Gigabit,$0.4110 hourly,$0.2810 hourly,$0.4110 hourly,$0.2810 hourly,$0.3288 hourly,$0.2248 hourly
+M3 Previous generation: (not recommended) Extra Large,cache.m3.xlarge,13.3 GiB,4 vCPUs,High,$0.3640 hourly,unavailable,$0.3640 hourly,unavailable,$0.2912 hourly,unavailable
+C7GN 16xlarge,cache.c7gn.16xlarge,105.81 GiB,64 vCPUs,200 Gigabit,$8.1470 hourly,$5.5400 hourly,$8.1470 hourly,$5.5400 hourly,$6.5176 hourly,$4.4320 hourly
+C7GN 12xlarge,cache.c7gn.12xlarge,78.56 GiB,48 vCPUs,150 Gigabit,$6.1100 hourly,$4.1550 hourly,$6.1100 hourly,$4.1550 hourly,$4.8880 hourly,$3.3240 hourly
+C1 Compute optimized (not recommended) Extra Large,cache.c1.xlarge,6.6 GiB,8 vCPUs,High,$0.6630 hourly,unavailable,$0.6630 hourly,unavailable,$0.5304 hourly,unavailable
+R6gd Memory optimized (SSD storage) 16xlarge,cache.r6gd.16xlarge,419.09 GiB,64 vCPUs,25 Gigabit,$12.4770 hourly,$8.4850 hourly,unavailable,unavailable,$9.9816 hourly,$6.7880 hourly
+R3 Memory optimized (not recommended) Eight Extra Large,cache.r3.8xlarge,237 GiB,32 vCPUs,10 Gigabit,$3.6400 hourly,unavailable,$3.6400 hourly,unavailable,$2.9120 hourly,unavailable
+M3 Previous generation: (not recommended) Medium,cache.m3.medium,2.78 GiB,1 vCPUs,Moderate,$0.0900 hourly,unavailable,$0.0900 hourly,unavailable,$0.0720 hourly,unavailable
+M7G 12xlarge,cache.m7g.12xlarge,157.12 GiB,48 vCPUs,22.5 Gigabit,$3.7700 hourly,$2.5640 hourly,$3.7700 hourly,$2.5640 hourly,$3.0160 hourly,$2.0512 hourly
+M7G Double Extra Large,cache.m7g.2xlarge,26.04 GiB,8 vCPUs,Up to 15 Gigabit,$0.6290 hourly,$0.4280 hourly,$0.6290 hourly,$0.4280 hourly,$0.5032 hourly,$0.3424 hourly
+R7G Large,cache.r7g.large,13.07 GiB,2 vCPUs,Up to 12.5 Gigabit,$0.2190 hourly,$0.1490 hourly,$0.2190 hourly,$0.1490 hourly,$0.1752 hourly,$0.1192 hourly
+M7G Eight Extra Large,cache.m7g.8xlarge,103.68 GiB,32 vCPUs,15 Gigabit,$2.5140 hourly,$1.7100 hourly,$2.5140 hourly,$1.7100 hourly,$2.0112 hourly,$1.3680 hourly
+C7GN Extra Large,cache.c7gn.xlarge,6.38 GiB,4 vCPUs,Up to 40 Gigabit,$0.5090 hourly,$0.3460 hourly,$0.5090 hourly,$0.3460 hourly,$0.4072 hourly,$0.2768 hourly
+M4 General Purpose Deca Extra Large,cache.m4.10xlarge,154.64 GiB,40 vCPUs,10 Gigabit,$3.1120 hourly,unavailable,$3.1120 hourly,unavailable,$2.4896 hourly,unavailable
+R6gd Memory optimized (SSD storage) 12xlarge,cache.r6gd.12xlarge,317.77 GiB,48 vCPUs,20 Gigabit,$9.3580 hourly,$6.3630 hourly,unavailable,unavailable,$7.4864 hourly,$5.0904 hourly
+T4g General Purpose Graviton Medium,cache.t4g.medium,3.09 GiB,2 vCPUs,Up to 5 Gigabit,$0.0650 hourly,$0.0440 hourly,$0.0650 hourly,$0.0440 hourly,$0.0520 hourly,$0.0352 hourly
+R6gd Memory optimized (SSD storage) Eight Extra Large,cache.r6gd.8xlarge,209.55 GiB,32 vCPUs,12 Gigabit,$6.2400 hourly,$4.2430 hourly,unavailable,unavailable,$4.9920 hourly,$3.3944 hourly
+R6g Memory optimized 12xlarge,cache.r6g.12xlarge,317.77 GiB,48 vCPUs,20 Gigabit,$4.9250 hourly,$3.3620 hourly,$4.9250 hourly,$3.3620 hourly,$3.9400 hourly,$2.6896 hourly
+R5 Memory optimized Double Extra Large,cache.r5.2xlarge,52.82 GiB,8 vCPUs,Up to 10 Gigabit,$0.8620 hourly,$0.5900 hourly,$0.8620 hourly,$0.5900 hourly,$0.6896 hourly,$0.4720 hourly
+M4 General Purpose Double Extra Large,cache.m4.2xlarge,29.7 GiB,8 vCPUs,High,$0.6230 hourly,unavailable,$0.6230 hourly,unavailable,$0.4984 hourly,unavailable
+M2 General Purpose Double Extra Large,cache.m2.2xlarge,33.8 GiB,4 vCPUs,Moderate,$0.6040 hourly,unavailable,$0.6040 hourly,unavailable,$0.4832 hourly,unavailable
+R5 Memory optimized Extra Large,cache.r5.xlarge,26.32 GiB,4 vCPUs,Up to 10 Gigabit,$0.4310 hourly,$0.2950 hourly,$0.4310 hourly,$0.2950 hourly,$0.3448 hourly,$0.2360 hourly
+M2 General Purpose Quadruple Extra Large,cache.m2.4xlarge,68 GiB,8 vCPUs,High,$1.2070 hourly,unavailable,$1.2070 hourly,unavailable,$0.9656 hourly,unavailable
+C7GN Eight Extra Large,cache.c7gn.8xlarge,52.26 GiB,32 vCPUs,100 Gigabit,$4.0730 hourly,$2.7700 hourly,$4.0730 hourly,$2.7700 hourly,$3.2584 hourly,$2.2160 hourly
+M1 Previous generation: (not recommended) Small,cache.m1.small,1.3 GiB,1 vCPUs,Low,$0.0550 hourly,unavailable,$0.0550 hourly,unavailable,$0.0440 hourly,unavailable
+R6gd Memory optimized (SSD storage) Quadruple Extra Large,cache.r6gd.4xlarge,105.81 GiB,16 vCPUs,Up to 10 Gigabit,$3.1200 hourly,$2.1210 hourly,unavailable,unavailable,$2.4960 hourly,$1.6968 hourly
+R6gd Memory optimized (SSD storage) Double Extra Large,cache.r6gd.2xlarge,52.82 GiB,8 vCPUs,Up to 10 Gigabit,$1.5600 hourly,$1.0610 hourly,unavailable,unavailable,$1.2480 hourly,$0.8488 hourly
+C7GN Large,cache.c7gn.large,3.09 GiB,2 vCPUs,Up to 30 Gigabit,$0.2550 hourly,$0.1730 hourly,$0.2550 hourly,$0.1730 hourly,$0.2040 hourly,$0.1384 hourly
+M3 Previous generation: (not recommended) Double Extra Large,cache.m3.2xlarge,27.9 GiB,8 vCPUs,High,$0.7280 hourly,unavailable,$0.7280 hourly,unavailable,$0.5824 hourly,unavailable
+R4 Memory optimized Eight Extra Large,cache.r4.8xlarge,203.26 GiB,32 vCPUs,10 Gigabit,$3.6400 hourly,unavailable,$3.6400 hourly,unavailable,$2.9120 hourly,unavailable
+M1 Previous generation: (not recommended) Large,cache.m1.large,7.1 GiB,2 vCPUs,Moderate,$0.2260 hourly,unavailable,$0.2260 hourly,unavailable,$0.1808 hourly,unavailable
+C7GN Double Extra Large,cache.c7gn.2xlarge,12.94 GiB,8 vCPUs,Up to 50 Gigabit,$1.0180 hourly,$0.6920 hourly,$1.0180 hourly,$0.6920 hourly,$0.8144 hourly,$0.5536 hourly

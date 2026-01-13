@@ -1,0 +1,7 @@
+Name,API Name,Instance Memory,vCPUs,Storage,IO,On Demand Cost,Reserved Cost
+Dense Compute DC2 Large,dc2.large,15 GiB,2 vCPUs,0.16TB SSD,0.60 GB/s,$0.2500 hourly,unavailable
+Managed Storage Extra Large,ra3.xlplus,32 GiB,4 vCPUs,32TB RMS,0.65 GB/s,$1.0860 hourly,$0.7602 hourly
+Managed Storage 16xlarge Extra Large,ra3.16xlarge,384 GiB,48 vCPUs,64TB RMS,8.00 GB/s,$13.0400 hourly,$9.1280 hourly
+Dense Compute DC2 Eight Extra Large,dc2.8xlarge,244 GiB,32 vCPUs,2.56TB SSD,7.50 GB/s,$4.8000 hourly,unavailable
+Managed Storage Quadruple Extra Large,ra3.4xlarge,96 GiB,12 vCPUs,64TB RMS,2.00 GB/s,$3.2600 hourly,$2.2820 hourly
+Managed Storage Large,ra3.large,16 GiB,2 vCPUs,8TB RMS,0.325 GB/s,$0.5430 hourly,$0.3801 hourly
