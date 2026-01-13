@@ -48,7 +48,9 @@ aws_rds_db_instance
 aws_iam_user
 ```
 
-### 2. Executar o script
+### 2. Executar os scripts
+
+#### Script Principal (all_resource.sh)
 
 ```bash
 # Modo interativo (recomendado para primeira execução)
@@ -64,12 +66,25 @@ aws_iam_user
 ./all_resource.sh --force
 ```
 
-### Opções disponíveis
-
+**Opções disponíveis:**
 - `--list`: Lista todas as tabelas com seus números de índice
 - `--table N`: Executa apenas a tabela de número N
 - `--force`: Continua executando mesmo se ocorrerem erros em algumas tabelas
 - (sem opções): Modo interativo com opções de continuação
+
+#### Script de Relatório do Athena (athena_report.sh)
+
+```bash
+# Gerar relatório completo de uso do Athena
+./athena_report.sh
+```
+
+Este script gera um relatório detalhado com:
+- Origem das chamadas (workgroups)
+- Bancos de dados acessados
+- Queries mais executadas e suas frequências
+- Distribuição temporal das execuções
+- Estatísticas por workgroup/database
 
 ## 📁 Estrutura de Arquivos
 
