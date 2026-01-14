@@ -13,11 +13,44 @@ Este script automatiza a coleta de dados de recursos AWS usando Steampipe, salva
 
 ```bash
 # Instalar Steampipe
-curl -fsSL https://steampipe.io/install.sh | bash
+sudo /bin/sh -c "$(curl -fsSL https://steampipe.io/install/steampipe.sh)"
+
+Referencia -> https://steampipe.io/downloads?install=linux
 
 # Instalar plugin AWS
 steampipe plugin install aws
 ```
+
+### Configuração de Conexões Steampipe
+
+O script utiliza conexões Steampipe configuradas para acessar múltiplas contas AWS. Configure suas conexões no arquivo `.steampipe/config/aws.spc`:
+
+```hcl
+# Exemplo de configuração com múltiplas contas
+connection "aws_xxz" {
+  plugin      = "aws"
+  profile     = "?????_HSLReadOnlyAccess"
+  regions     = ["us-east-*", "sa-east-*"]
+}
+
+connection "aws_xyz" {
+  plugin      = "aws"
+  profile     = "????_HSLReadOnlyAccess"
+  regions     = ["us-east-*", "sa-east-*"]
+}
+
+# Aggregator para combinar todas as contas
+connection "aws_all" {
+  type        = "aggregator"
+  plugin      = "aws"
+  connections = ["aws_*"]  # Inclui todas as conexões que começam com "aws_"
+}
+```
+
+**Detalhes importantes:**
+- O script `athena_report.sh` utiliza o aggregator `aws_all` para consultar todas as contas configuradas simultaneamente
+- Você pode escolher executar o relatório para todas as contas ou para uma conta específica
+- Para mais informações sobre configuração de conexões, consulte: [https://steampipe.io/docs/managing/connections](https://steampipe.io/docs/managing/connections)
 
 ### Configuração do AWS
 
