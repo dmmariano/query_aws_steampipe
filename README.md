@@ -111,21 +111,22 @@ Summary of coverage:
 - Databases: `query_aws_rds_db_cluster.sh`, `query_aws_rds_db_instance.sh`.
 - S3: `query_aws_s3.sh` (Steampipe), `query_aws_s3_bash.sh` (AWS CLI size metrics).
 
-Generated files by script:
-- `query_aws_cost_by_region_monthly.sh` -> `CSV_DIR/aws_cost_by_region_monthly.csv`
-- `query_aws_cost_by_service_usage_type_monthly.sh` -> `CSV_DIR/aws_cost_by_service_usage_type_monthly.csv`
-- `query_aws_ec2_application_load_balancer.sh` -> `CSV_DIR/aws_ec2_application_load_balancer.csv`
-- `query_aws_ec2_classic_load_balancer.sh` -> `CSV_DIR/aws_ec2_classic_load_balancer.csv`
-- `query_aws_ec2_network_load_balancer.sh` -> `CSV_DIR/aws_ec2_network_load_balancer.csv`
-- `query_aws_ec2_instance.sh` -> `CSV_DIR/aws_ec2_instance.csv`
-- `query_aws_ec2_block.sh` -> `CSV_DIR/aws_ec2_instance_block.csv`
-- `query_aws_efs_file_system.sh` -> `CSV_DIR/aws-efs-elastic_file_system.csv`
-- `query_aws_eks_node_group.sh` -> `CSV_DIR/aws_eks_node_group.csv`
-- `query_aws_elasticache_cluster.sh` -> `CSV_DIR/aws_elasticache_cluster.csv`
-- `query_aws_rds_db_cluster.sh` -> `CSV_DIR/aws_rds_db_cluster.csv`
-- `query_aws_rds_db_instance.sh` -> `CSV_DIR/aws_rds_db_instance.csv`
-- `query_aws_s3.sh` -> `CSV_DIR/aws_s3_bucket.csv`
-- `query_aws_s3_bash.sh` -> `CSV_DIR/aws_s3_bucket_size.csv`
+Generated output structure (basic):
+```
+Script_All_Resources/
+  csv/
+  all_resources_consolidado_aws.xlsx
+  erro_execucao.log
+Discovery_Athena/
+  csv/
+  athena_reports/
+  aws_resources_consolidado.xlsx
+  erro_execucao.log
+discovery_basico/
+  csv/
+  consolidado_aws.xlsx
+  last_completed.txt
+```
 
 ## Configuration Notes
 
