@@ -52,8 +52,9 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
   - Supports `--list`, `--table N`, `--force`, and resume prompts.
   - When enabled, runs Athena/Glue collection using AWS CLI and appends results to the same CSV folder.
   - Generates `resumo_quantidade_linhas.csv` and Excel output.
-- Outputs:
+- Generated files:
   - `Script_All_Resources/csv/*.csv`
+  - `Script_All_Resources/csv/resumo_quantidade_linhas.csv`
   - `Script_All_Resources/all_resources_consolidado_aws.xlsx`
   - `Script_All_Resources/erro_execucao.log`
 
@@ -68,7 +69,7 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
   - Prompts for all accounts or a single connection.
   - Queries `aws_athena_query_execution` for the last N days (limit 10,000 rows).
   - Generates a text report with workgroups, databases, statement types, top queries, and daily distribution.
-- Outputs:
+- Generated files:
   - `Discovery_Athena/athena_reports/athena_executions.csv`
   - `Discovery_Athena/athena_reports/athena_report.txt`
 
@@ -79,7 +80,7 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
   - Lists workgroups, collects query executions, and aggregates unique queries with counts.
   - Collects Glue jobs per region.
   - Writes CSVs, summary CSV, and Excel workbook.
-- Outputs:
+- Generated files:
   - `Discovery_Athena/csv/aws_athena_query_execution.csv`
   - `Discovery_Athena/csv/aws_glue_job.csv`
   - `Discovery_Athena/csv/resumo_quantidade_linhas.csv`
@@ -90,7 +91,7 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
 
 `discovery_basico/discovery_all.sh`
 - Summary: orchestrates a curated discovery run, enriches EC2/RDS/ElastiCache outputs with vCPU and memory using reference CSVs, and consolidates everything into Excel with resume/skip support.
-- Outputs:
+- Generated files:
   - `discovery_basico/csv/*.csv`
   - `discovery_basico/consolidado_aws.xlsx`
   - `discovery_basico/last_completed.txt`
@@ -110,7 +111,21 @@ Summary of coverage:
 - Databases: `query_aws_rds_db_cluster.sh`, `query_aws_rds_db_instance.sh`.
 - S3: `query_aws_s3.sh` (Steampipe), `query_aws_s3_bash.sh` (AWS CLI size metrics).
 
-Outputs are written to `CSV_DIR` and follow each script's CSV filename (for example, `aws_ec2_instance.csv`).
+Generated files by script:
+- `query_aws_cost_by_region_monthly.sh` -> `CSV_DIR/aws_cost_by_region_monthly.csv`
+- `query_aws_cost_by_service_usage_type_monthly.sh` -> `CSV_DIR/aws_cost_by_service_usage_type_monthly.csv`
+- `query_aws_ec2_application_load_balancer.sh` -> `CSV_DIR/aws_ec2_application_load_balancer.csv`
+- `query_aws_ec2_classic_load_balancer.sh` -> `CSV_DIR/aws_ec2_classic_load_balancer.csv`
+- `query_aws_ec2_network_load_balancer.sh` -> `CSV_DIR/aws_ec2_network_load_balancer.csv`
+- `query_aws_ec2_instance.sh` -> `CSV_DIR/aws_ec2_instance.csv`
+- `query_aws_ec2_block.sh` -> `CSV_DIR/aws_ec2_instance_block.csv`
+- `query_aws_efs_file_system.sh` -> `CSV_DIR/aws-efs-elastic_file_system.csv`
+- `query_aws_eks_node_group.sh` -> `CSV_DIR/aws_eks_node_group.csv`
+- `query_aws_elasticache_cluster.sh` -> `CSV_DIR/aws_elasticache_cluster.csv`
+- `query_aws_rds_db_cluster.sh` -> `CSV_DIR/aws_rds_db_cluster.csv`
+- `query_aws_rds_db_instance.sh` -> `CSV_DIR/aws_rds_db_instance.csv`
+- `query_aws_s3.sh` -> `CSV_DIR/aws_s3_bucket.csv`
+- `query_aws_s3_bash.sh` -> `CSV_DIR/aws_s3_bucket_size.csv`
 
 ## Configuration Notes
 
