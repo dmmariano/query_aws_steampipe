@@ -156,6 +156,10 @@ TABLE_PREFIX=aws_all CSV_DIR=./csv bash discovery_basico/scripts/<script>.sh
 - Output: `aws_s3_bucket_size.csv`
 - Lists buckets per AWS CLI profile, fetches BucketSizeBytes averages for the last 3 days, and includes a TOTAL row.
 
+### Docs_Start_Install.sh
+
+Quick install snippet for Steampipe (reference only).
+
 ## Configuration Notes
 
 ### AWS Connections
