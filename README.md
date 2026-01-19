@@ -31,7 +31,7 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
    - Python 3 with pandas (`pip install pandas openpyxl`)
    - jq
 
-5. Create `tables_query.txt` with the list of AWS tables to query (one per line)
+5. Review `Script_All_Resources/tables_query.txt` and adjust as needed (one table per line)
 
 ## Repository Layout
 
@@ -96,11 +96,14 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
   - `discovery_basico/consolidado_aws.xlsx`
   - `discovery_basico/last_completed.txt`
 
+Note: `all_resource.sh` and `discovery_all.sh` expect an `aws_all` aggregator connection in Steampipe. If you only have a single connection, either create an `aws_all` aggregator or adjust `TABLE_PREFIX` in the scripts.
+
 ### discovery_basico/scripts
 
 All scripts in this folder write CSVs to `CSV_DIR` and expect `TABLE_PREFIX` and `CSV_DIR` to be set (usually by `discovery_all.sh`). To run one manually:
 
 ```bash
+mkdir -p ./csv
 TABLE_PREFIX=aws_all CSV_DIR=./csv bash discovery_basico/scripts/<script>.sh
 ```
 
@@ -110,6 +113,8 @@ Summary of coverage:
 - Compute and storage: `query_aws_ec2_instance.sh`, `query_aws_ec2_block.sh`, `query_aws_efs_file_system.sh`, `query_aws_eks_node_group.sh`, `query_aws_elasticache_cluster.sh`.
 - Databases: `query_aws_rds_db_cluster.sh`, `query_aws_rds_db_instance.sh`.
 - S3: `query_aws_s3.sh` (Steampipe), `query_aws_s3_bash.sh` (AWS CLI size metrics).
+
+Note: `query_aws_s3_bash.sh` uses `date -v` (macOS). On Linux, replace with GNU date syntax.
 
 Generated output structure (basic):
 ```
