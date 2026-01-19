@@ -1,132 +1,169 @@
-# AWS All Resources Discovery Script
+# AWS Query Scripts (Steampipe + AWS CLI)
 
-This repository contains a comprehensive script for collecting and consolidating AWS resource data across multiple accounts and regions using Steampipe.
+This repository contains scripts for AWS inventory, cost, and usage reporting using Steampipe and AWS CLI.
 
-## Overview
+## Requirements
 
-The `all_resource.sh` script automates the collection of AWS resource data by querying Steampipe tables, saving results to individual CSV files, and consolidating everything into a single Excel spreadsheet. It supports incremental execution, error handling, and optional Athena/Glue reporting via AWS CLI.
+- Steampipe with the AWS plugin
+- AWS CLI (required for Athena/Glue and S3 size scripts)
+- Python 3 with pandas and openpyxl
+- jq (for Athena/Glue reporting via AWS CLI)
+- bc (for `query_aws_s3_bash.sh`)
+- AWS connections configured in `~/.steampipe/config/aws.spc`
 
-## Features
+## Repository Layout
 
-- **Comprehensive Data Collection**: Queries all configured AWS tables from Steampipe
-- **Multi-Account Support**: Supports multiple AWS accounts via Steampipe aggregators
-- **Incremental Execution**: Resume interrupted runs from any table
-- **Flexible Execution Modes**:
-  - Interactive mode with progress tracking
-  - Single table execution (`--table N`)
-  - List all tables (`--list`)
-  - Force mode to continue despite errors (`--force`)
-- **Integrated Athena/Glue Reports**: AWS CLI collection for Athena queries and Glue jobs (can be run individually)
-- **Progress Tracking**: Real-time progress with ETA calculations
-- **Error Handling**: Detailed logging and graceful error recovery
-- **Excel Consolidation**: Automatic consolidation of all CSV data into a single Excel file
+- `Script_All_Resources/`: full inventory across Steampipe tables + optional Athena/Glue via AWS CLI
+- `Discovery_Athena/`: Athena usage reports (Steampipe or AWS CLI)
+- `discovery_basico/`: curated discovery workflow + enrichment + Excel consolidation
+- `discovery_basico/scripts/`: individual Steampipe/AWS CLI queries
+- `discovery_basico/scripts/info_aws_*.csv`: reference files used for enrichment
 
-## Prerequisites
+## Script Catalog
 
-- **Steampipe** installed and configured with AWS plugin
-- **AWS CLI** installed (for optional Athena/Glue reports)
-- **Python 3** with pandas for Excel generation
-- **jq** for JSON processing (for Athena/Glue reports)
-- AWS credentials configured in Steampipe (`~/.steampipe/config/aws.spc`)
-- Table list file: `tables_query.txt` (contains list of Steampipe tables to query)
+### Script_All_Resources
 
-## Installation
+`Script_All_Resources/all_resource.sh`
+- What it does: runs Steampipe queries for all tables listed in `tables_query.txt`, writes per-table CSVs, optionally runs Athena/Glue collection via AWS CLI, then generates a summary CSV and Excel workbook.
+- How it works:
+  - Uses `TABLE_PREFIX=aws_all` and `steampipe query` for each table.
+  - Supports `--list`, `--table N`, `--force`, and resume prompts.
+  - When enabled, runs Athena/Glue collection using AWS CLI and appends results to the same CSV folder.
+  - Generates `resumo_quantidade_linhas.csv` and Excel output.
+- Outputs:
+  - `Script_All_Resources/csv/*.csv`
+  - `Script_All_Resources/all_resources_consolidado_aws.xlsx`
+  - `Script_All_Resources/erro_execucao.log`
 
-1. Install Steampipe:
-   ```bash
-   sudo /bin/sh -c "$(curl -fsSL https://steampipe.io/install/steampipe.sh)"
-   ```
+`Script_All_Resources/tables_query.txt`
+- List of Steampipe tables to query (one per line). Comments and blank lines are ignored.
 
-2. Install AWS plugin for Steampipe:
-   ```bash
-   steampipe plugin install aws
-   ```
+### Discovery_Athena
 
-3. Configure AWS connections in `~/.steampipe/config/aws.spc`
+`Discovery_Athena/athena_report.sh`
+- What it does: builds an Athena usage report using Steampipe.
+- How it works:
+  - Prompts for all accounts or a single connection.
+  - Queries `aws_athena_query_execution` for the last N days (limit 10,000 rows).
+  - Generates a text report with workgroups, databases, statement types, top queries, and daily distribution.
+- Outputs:
+  - `Discovery_Athena/athena_reports/athena_executions.csv`
+  - `Discovery_Athena/athena_reports/athena_report.txt`
 
-4. Install required dependencies:
-   - AWS CLI
-   - Python 3 with pandas (`pip install pandas openpyxl`)
-   - jq
+`Discovery_Athena/athena_report_awscli.sh`
+- What it does: collects Athena query executions and Glue jobs directly via AWS CLI.
+- How it works:
+  - Reads profiles and regions from `~/.steampipe/config/aws.spc`.
+  - Lists workgroups, collects query executions, and aggregates unique queries with counts.
+  - Collects Glue jobs per region.
+  - Writes CSVs, summary CSV, and Excel workbook.
+- Outputs:
+  - `Discovery_Athena/csv/aws_athena_query_execution.csv`
+  - `Discovery_Athena/csv/aws_glue_job.csv`
+  - `Discovery_Athena/csv/resumo_quantidade_linhas.csv`
+  - `Discovery_Athena/aws_resources_consolidado.xlsx`
+  - `Discovery_Athena/erro_execucao.log`
 
-5. Create `tables_query.txt` with the list of AWS tables to query (one per line)
+### discovery_basico
 
-## Usage
+`discovery_basico/discovery_all.sh`
+- What it does: runs a curated set of discovery scripts, enriches outputs with vCPU/memory, and consolidates to Excel.
+- How it works:
+  - Sets `TABLE_PREFIX=aws_all`, `CSV_DIR`, and reference file paths.
+  - Runs scripts in `discovery_basico/scripts/` sequentially with resume/skip support.
+  - Enriches EC2, RDS, and ElastiCache CSVs using `info_aws_*.csv` reference files and adds totals.
+  - Consolidates CSVs and logs into `consolidado_aws.xlsx`.
+- Outputs:
+  - `discovery_basico/csv/*.csv`
+  - `discovery_basico/consolidado_aws.xlsx`
+  - `discovery_basico/last_completed.txt`
 
-### Basic Execution
+### discovery_basico/scripts
+
+All scripts in this folder write CSVs to `CSV_DIR` and expect `TABLE_PREFIX` and `CSV_DIR` to be set (usually by `discovery_all.sh`). To run one manually:
+
 ```bash
-cd Steampipe/query_aws/Script_All_Resources
-./all_resource.sh
+TABLE_PREFIX=aws_all CSV_DIR=./csv bash discovery_basico/scripts/<script>.sh
 ```
 
-The script will:
-- Test Steampipe connection
-- Display total number of tables
-- Run queries for each table with progress tracking
-- Optionally include Athena/Glue reports
-- Generate consolidated Excel file
+`query_aws_cost_by_region_monthly.sh`
+- Steampipe table: `aws_cost_by_region_monthly`
+- Output: `aws_cost_by_region_monthly.csv`
+- Captures monthly cost and usage metrics by region.
 
-### Command Line Options
+`query_aws_cost_by_service_usage_type_monthly.sh`
+- Steampipe table: `aws_cost_by_service_usage_type_monthly`
+- Output: `aws_cost_by_service_usage_type_monthly.csv`
+- Captures monthly cost and usage metrics by service and usage type.
 
-#### List All Tables
-```bash
-./all_resource.sh --list
-```
-Displays numbered list of all tables from `tables_query.txt`
+`query_aws_ec2_application_load_balancer.sh`
+- Steampipe table: `aws_ec2_application_load_balancer`
+- Output: `aws_ec2_application_load_balancer.csv`
+- Captures ALB identifiers, scheme, type, and account metadata.
 
-#### Execute Single Table
-```bash
-./all_resource.sh --table N
-```
-Executes only the Nth table from the list
+`query_aws_ec2_classic_load_balancer.sh`
+- Steampipe table: `aws_ec2_classic_load_balancer`
+- Output: `aws_ec2_classic_load_balancer.csv`
+- Captures classic ELB identifiers and account metadata.
 
-#### Force Mode
-```bash
-./all_resource.sh --force
-```
-Continues execution even when encountering errors
+`query_aws_ec2_network_load_balancer.sh`
+- Steampipe table: `aws_ec2_network_load_balancer`
+- Output: `aws_ec2_network_load_balancer.csv`
+- Captures NLB identifiers, scheme, type, and account metadata.
 
-#### Resume Previous Run
-When CSV files exist from a previous run, the script will prompt to resume from a specific table number.
+`query_aws_ec2_instance.sh`
+- Steampipe table: `aws_ec2_instance`
+- Output: `aws_ec2_instance.csv`
+- Captures instance metadata, instance type, state, and tags.
 
-## File Structure
+`query_aws_ec2_block.sh`
+- Steampipe tables: `aws_ec2_instance` + `aws_ebs_volume`
+- Output: `aws_ec2_instance_block.csv`
+- Joins instances with attached EBS volumes to compute total volume size per instance.
 
-```
-Script_All_Resources/
-├── all_resource.sh              # Main execution script
-├── tables_query.txt             # List of Steampipe tables to query
-├── csv/                         # Output directory for CSV files
-│   ├── table1.csv
-│   ├── table2.csv
-│   └── resumo_quantidade_linhas.csv
-├── all_resources_consolidado_aws.xlsx  # Consolidated Excel output
-├── erro_execucao.log            # Error log file
-└── .DS_Store                    # macOS system file
-```
+`query_aws_efs_file_system.sh`
+- Steampipe table: `aws_efs_file_system`
+- Output: `aws-efs-elastic_file_system.csv`
+- Captures EFS size and throughput fields.
 
-## Output Files
+`query_aws_eks_node_group.sh`
+- Steampipe table: `aws_eks_node_group`
+- Output: `aws_eks_node_group.csv`
+- Captures node group status, scaling config, and instance types.
 
-- **CSV Files**: Individual table data in `csv/` directory
-- **Excel File**: `all_resources_consolidado_aws.xlsx` with:
-  - `00_resumo` sheet: Summary of row counts per table
-  - Individual sheets for each table's data
-- **Summary CSV**: `resumo_quantidade_linhas.csv` with file names and row counts
-- **Error Log**: `erro_execucao.log` with detailed error information
+`query_aws_elasticache_cluster.sh`
+- Steampipe table: `aws_elasticache_cluster`
+- Output: `aws_elasticache_cluster.csv`
+- Captures ElastiCache cluster size, engine, and node types.
 
-## Configuration
+`query_aws_rds_db_cluster.sh`
+- Steampipe table: `aws_rds_db_cluster`
+- Output: `aws_rds_db_cluster.csv`
+- Captures cluster engine, status, and node count.
 
-### tables_query.txt Format
-```
-aws_ec2_instance
-aws_s3_bucket
-aws_iam_user
-aws_rds_db_instance
-# Comments are ignored
-aws_lambda_function
-```
+`query_aws_rds_db_instance.sh`
+- Steampipe table: `aws_rds_db_instance`
+- Output: `aws_rds_db_instance.csv`
+- Captures instance class, storage, engine, and backup retention.
+
+`query_aws_s3.sh`
+- Steampipe table: `aws_s3_bucket`
+- Output: `aws_s3_bucket.csv`
+- Captures bucket name, region, and account metadata.
+
+`query_aws_s3_bash.sh`
+- AWS CLI + CloudWatch metrics
+- Output: `aws_s3_bucket_size.csv`
+- Lists buckets per AWS CLI profile, fetches BucketSizeBytes averages for the last 3 days, and includes a TOTAL row.
+
+### Docs_Start_Install.sh
+
+Quick install snippet for Steampipe (reference only).
+
+## Configuration Notes
 
 ### AWS Connections
-Configure multiple AWS accounts in `~/.steampipe/config/aws.spc`:
+Example `~/.steampipe/config/aws.spc`:
 ```
 connection "aws_account1" {
   plugin = "aws"
@@ -142,7 +179,6 @@ connection "aws_account2" {
 ```
 
 ### Multi-Account Aggregation
-Create an aggregator connection:
 ```
 connection "aws_all" {
   plugin = "aws"
@@ -151,51 +187,8 @@ connection "aws_all" {
 }
 ```
 
-## Athena/Glue Integration
+## Common Issues
 
-When prompted, the script can optionally collect:
-- **Athena Query Executions**: Query history, databases, workgroups
-- **Glue Jobs**: Job configurations, execution details, metadata
-
-This requires:
-- Valid AWS CLI credentials
-- Appropriate IAM permissions for Athena and Glue services
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Steampipe Connection Failed**
-   - Verify AWS credentials are configured
-   - Check `~/.steampipe/config/aws.spc` configuration
-   - Run `steampipe query "select 1"`
-
-2. **Access Denied Errors**
-   - Ensure IAM user/role has appropriate permissions
-   - Some tables may require specific AWS service permissions
-
-3. **Empty CSV Files**
-   - Check if the AWS account has resources for that service
-   - Verify correct regions are configured
-
-### Logs
-Check `erro_execucao.log` for detailed error information and debugging.
-
-## Performance Notes
-
-- Large datasets may take significant time to process
-- Excel consolidation is memory-intensive for many/large tables
-- Consider running single tables (`--table N`) for testing
-- Use `--force` mode to skip problematic tables in production
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Test changes with sample data
-4. Update documentation as needed
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- **Steampipe connection failed**: confirm AWS credentials and test `steampipe query "select 1"`.
+- **Access denied**: required IAM permissions vary by table.
+- **Empty CSVs**: may mean the account/region has no resources for that service.
