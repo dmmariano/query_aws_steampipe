@@ -11,6 +11,28 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
 - bc (for `query_aws_s3_bash.sh`)
 - AWS connections configured in `~/.steampipe/config/aws.spc`
 
+## Installation
+
+1. Install Steampipe:
+   ```bash
+   sudo /bin/sh -c "$(curl -fsSL https://steampipe.io/install/steampipe.sh)"
+   ```
+   Reference: https://steampipe.io
+
+2. Install AWS plugin for Steampipe:
+   ```bash
+   steampipe plugin install aws
+   ```
+
+3. Configure AWS connections in `~/.steampipe/config/aws.spc`
+
+4. Install required dependencies:
+   - AWS CLI
+   - Python 3 with pandas (`pip install pandas openpyxl`)
+   - jq
+
+5. Create `tables_query.txt` with the list of AWS tables to query (one per line)
+
 ## Repository Layout
 
 - `Script_All_Resources/`: full inventory across Steampipe tables + optional Athena/Glue via AWS CLI
@@ -67,12 +89,7 @@ This repository contains scripts for AWS inventory, cost, and usage reporting us
 ### discovery_basico
 
 `discovery_basico/discovery_all.sh`
-- What it does: runs a curated set of discovery scripts, enriches outputs with vCPU/memory, and consolidates to Excel.
-- How it works:
-  - Sets `TABLE_PREFIX=aws_all`, `CSV_DIR`, and reference file paths.
-  - Runs scripts in `discovery_basico/scripts/` sequentially with resume/skip support.
-  - Enriches EC2, RDS, and ElastiCache CSVs using `info_aws_*.csv` reference files and adds totals.
-  - Consolidates CSVs and logs into `consolidado_aws.xlsx`.
+- Summary: orchestrates a curated discovery run, enriches EC2/RDS/ElastiCache outputs with vCPU and memory using reference CSVs, and consolidates everything into Excel with resume/skip support.
 - Outputs:
   - `discovery_basico/csv/*.csv`
   - `discovery_basico/consolidado_aws.xlsx`
