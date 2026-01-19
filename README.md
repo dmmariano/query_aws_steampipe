@@ -112,10 +112,6 @@ Summary of coverage:
 
 Outputs are written to `CSV_DIR` and follow each script's CSV filename (for example, `aws_ec2_instance.csv`).
 
-### Docs_Start_Install.sh
-
-Quick install snippet for Steampipe (reference only).
-
 ## Configuration Notes
 
 ### AWS Connections
