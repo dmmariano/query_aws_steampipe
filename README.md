@@ -103,75 +103,14 @@ All scripts in this folder write CSVs to `CSV_DIR` and expect `TABLE_PREFIX` and
 TABLE_PREFIX=aws_all CSV_DIR=./csv bash discovery_basico/scripts/<script>.sh
 ```
 
-`query_aws_cost_by_region_monthly.sh`
-- Steampipe table: `aws_cost_by_region_monthly`
-- Output: `aws_cost_by_region_monthly.csv`
-- Captures monthly cost and usage metrics by region.
+Summary of coverage:
+- Cost reporting: `query_aws_cost_by_region_monthly.sh`, `query_aws_cost_by_service_usage_type_monthly.sh`.
+- Load balancers: `query_aws_ec2_application_load_balancer.sh`, `query_aws_ec2_classic_load_balancer.sh`, `query_aws_ec2_network_load_balancer.sh`.
+- Compute and storage: `query_aws_ec2_instance.sh`, `query_aws_ec2_block.sh`, `query_aws_efs_file_system.sh`, `query_aws_eks_node_group.sh`, `query_aws_elasticache_cluster.sh`.
+- Databases: `query_aws_rds_db_cluster.sh`, `query_aws_rds_db_instance.sh`.
+- S3: `query_aws_s3.sh` (Steampipe), `query_aws_s3_bash.sh` (AWS CLI size metrics).
 
-`query_aws_cost_by_service_usage_type_monthly.sh`
-- Steampipe table: `aws_cost_by_service_usage_type_monthly`
-- Output: `aws_cost_by_service_usage_type_monthly.csv`
-- Captures monthly cost and usage metrics by service and usage type.
-
-`query_aws_ec2_application_load_balancer.sh`
-- Steampipe table: `aws_ec2_application_load_balancer`
-- Output: `aws_ec2_application_load_balancer.csv`
-- Captures ALB identifiers, scheme, type, and account metadata.
-
-`query_aws_ec2_classic_load_balancer.sh`
-- Steampipe table: `aws_ec2_classic_load_balancer`
-- Output: `aws_ec2_classic_load_balancer.csv`
-- Captures classic ELB identifiers and account metadata.
-
-`query_aws_ec2_network_load_balancer.sh`
-- Steampipe table: `aws_ec2_network_load_balancer`
-- Output: `aws_ec2_network_load_balancer.csv`
-- Captures NLB identifiers, scheme, type, and account metadata.
-
-`query_aws_ec2_instance.sh`
-- Steampipe table: `aws_ec2_instance`
-- Output: `aws_ec2_instance.csv`
-- Captures instance metadata, instance type, state, and tags.
-
-`query_aws_ec2_block.sh`
-- Steampipe tables: `aws_ec2_instance` + `aws_ebs_volume`
-- Output: `aws_ec2_instance_block.csv`
-- Joins instances with attached EBS volumes to compute total volume size per instance.
-
-`query_aws_efs_file_system.sh`
-- Steampipe table: `aws_efs_file_system`
-- Output: `aws-efs-elastic_file_system.csv`
-- Captures EFS size and throughput fields.
-
-`query_aws_eks_node_group.sh`
-- Steampipe table: `aws_eks_node_group`
-- Output: `aws_eks_node_group.csv`
-- Captures node group status, scaling config, and instance types.
-
-`query_aws_elasticache_cluster.sh`
-- Steampipe table: `aws_elasticache_cluster`
-- Output: `aws_elasticache_cluster.csv`
-- Captures ElastiCache cluster size, engine, and node types.
-
-`query_aws_rds_db_cluster.sh`
-- Steampipe table: `aws_rds_db_cluster`
-- Output: `aws_rds_db_cluster.csv`
-- Captures cluster engine, status, and node count.
-
-`query_aws_rds_db_instance.sh`
-- Steampipe table: `aws_rds_db_instance`
-- Output: `aws_rds_db_instance.csv`
-- Captures instance class, storage, engine, and backup retention.
-
-`query_aws_s3.sh`
-- Steampipe table: `aws_s3_bucket`
-- Output: `aws_s3_bucket.csv`
-- Captures bucket name, region, and account metadata.
-
-`query_aws_s3_bash.sh`
-- AWS CLI + CloudWatch metrics
-- Output: `aws_s3_bucket_size.csv`
-- Lists buckets per AWS CLI profile, fetches BucketSizeBytes averages for the last 3 days, and includes a TOTAL row.
+Outputs are written to `CSV_DIR` and follow each script's CSV filename (for example, `aws_ec2_instance.csv`).
 
 ### Docs_Start_Install.sh
 
