@@ -1,0 +1,10 @@
+# Outputs and local artifacts
+**/csv/
+**/aws_reports/
+**/athena_reports/
+*.xlsx
+*.log
+*.tmp
+~$*.xlsx
+.DS_Store
+last_completed.txt
