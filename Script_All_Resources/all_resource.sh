@@ -30,119 +30,151 @@ export OUTPUT_XLSX="${SCRIPT_DIR}/all_resources_consolidado_aws.xlsx"
 export LOG_FILE="${SCRIPT_DIR}/erro_execucao.log"
 export RESUMO_CSV="${CSV_DIR}/resumo_quantidade_linhas.csv"
 
+AWS_RUN_MODE="all"
+AWS_CONFIG_DONE=false
+AWS_CONFIG_MODE=""
+AWS_MULTI_ACCOUNT=false
+AWS_CONNECTION_NAME=""
+AWS_PROFILE=""
+AWS_EXPANDED_REGIONS=()
+AWS_ALL_CONNECTIONS=()
+AWS_ALL_PROFILES=()
+AWS_ALL_REGIONS=()
+ATHENA_RAN=false
+GLUE_RAN=false
+
 TABLE_LIST="${SCRIPT_DIR}/tables_query.txt"
 [ ! -f "$TABLE_LIST" ] && { echo "Table list file not found: $TABLE_LIST"; exit 1; }
 
-setup_aws_config() {
-  local RUN_ALL PROFILE PROFILE_PARAM SPC_FILE
-  local -a EXPANDED_REGIONS ALL_CONNECTIONS ALL_PROFILES CONNECTIONS PROFILES_MAP REGIONS_ARRAY
-
-  # Select accounts (same as athena_report_awscli.sh)
-  echo "🔍 Select accounts for analysis:"
-  read -p "Run for all accounts? (y/n): " RUN_ALL
-
-  if [[ "$RUN_ALL" =~ ^[Yy]$ ]]; then
-    echo "📊 Using all accounts (multi-account mode)"
-    echo "⚠️  Note: In multi-account mode, valid credentials for each account are required"
-    PROFILE=""
-    PROFILE_PARAM=""
-    SPC_FILE="${HOME}/.steampipe/config/aws.spc"
-    if [ ! -f "$SPC_FILE" ]; then
-      echo "❌ Steampipe configuration file not found: $SPC_FILE"
-      return 1
-    fi
-    ALL_CONNECTIONS=()
-    ALL_PROFILES=()
-    while IFS= read -r conn_line; do
-      connection=$(echo "$conn_line" | sed 's/connection "\(.*\)".*/\1/')
-      profile_line=$(grep -A 10 "$conn_line" "$SPC_FILE" | grep 'profile.*=' | head -1)
-      if [ ! -z "$profile_line" ]; then
-        profile=$(echo "$profile_line" | sed 's/.*profile.*= "\(.*\)".*/\1/')
-        ALL_CONNECTIONS+=("$connection")
-        ALL_PROFILES+=("$profile")
-      fi
-    done < <(grep '^connection ' "$SPC_FILE")
-    EXPANDED_REGIONS=("sa-east-1")
-  else
-    SPC_FILE="${HOME}/.steampipe/config/aws.spc"
-    if [ ! -f "$SPC_FILE" ]; then
-      echo "❌ Steampipe configuration file not found: $SPC_FILE"
-      return 1
-    fi
-
-    echo "🔍 Available connections in aws.spc:"
-    CONNECTIONS=()
-    PROFILES_MAP=()
-
-    while IFS= read -r conn_line; do
-      connection=$(echo "$conn_line" | sed 's/connection "\(.*\)".*/\1/')
-      profile_line=$(grep -A 10 "$conn_line" "$SPC_FILE" | grep 'profile.*=' | head -1)
-      if [ ! -z "$profile_line" ]; then
-        profile=$(echo "$profile_line" | sed 's/.*profile.*= "\(.*\)".*/\1/')
-        CONNECTIONS+=("$connection")
-        PROFILES_MAP+=("$profile")
-        echo "$(( ${#CONNECTIONS[@]} )): $connection"
-      fi
-    done < <(grep '^connection ' "$SPC_FILE")
-
-    if [ ${#CONNECTIONS[@]} -eq 0 ]; then
-      echo "❌ No connections found in aws.spc file"
-      return 1
-    fi
-
-    read -p "Choose the connection number (1-${#CONNECTIONS[@]}): " profile_choice
-
-    if ! [[ "$profile_choice" =~ ^[0-9]+$ ]] || [ "$profile_choice" -lt 1 ] || [ "$profile_choice" -gt ${#CONNECTIONS[@]} ]; then
-      echo "❌ Invalid choice. Using the first connection."
-      profile_choice=1
-    fi
-
-    CONNECTION_NAME="${CONNECTIONS[$((profile_choice-1))]}"
-    PROFILE="${PROFILES_MAP[$((profile_choice-1))]}"
-    PROFILE_PARAM="--profile $PROFILE"
-
-    conn_line=$(grep "^connection \"$CONNECTION_NAME\"" "$SPC_FILE")
-    regions_line=$(grep -A 10 "$conn_line" "$SPC_FILE" | grep "regions.*=" | head -1)
-    if [ ! -z "$regions_line" ]; then
-      regions_str=$(echo "$regions_line" | sed 's/.*regions.*= \[\(.*\)\].*/\1/')
-      IFS=',' read -ra REGIONS_ARRAY <<< "$(echo "$regions_str" | sed 's/[" ]//g')"
-
-      EXPANDED_REGIONS=()
-      for region_pattern in "${REGIONS_ARRAY[@]}"; do
-        if [[ "$region_pattern" == *"-*" ]]; then
-          base_region=$(echo "$region_pattern" | sed 's/\*$//')
-          case "$base_region" in
-            "us-east-") EXPANDED_REGIONS+=("us-east-1" "us-east-2") ;;
-            "us-west-") EXPANDED_REGIONS+=("us-west-1" "us-west-2") ;;
-            "eu-west-") EXPANDED_REGIONS+=("eu-west-1" "eu-west-2" "eu-west-3") ;;
-            "eu-central-") EXPANDED_REGIONS+=("eu-central-1") ;;
-            "ap-southeast-") EXPANDED_REGIONS+=("ap-southeast-1" "ap-southeast-2") ;;
-            "ap-northeast-") EXPANDED_REGIONS+=("ap-northeast-1" "ap-northeast-2" "ap-northeast-3") ;;
-            "sa-east-") EXPANDED_REGIONS+=("sa-east-1") ;;
-            *) EXPANDED_REGIONS+=("$region_pattern") ;;
-          esac
-        else
-          EXPANDED_REGIONS+=("$region_pattern")
-        fi
-      done
-    else
-      EXPANDED_REGIONS=("sa-east-1")
-    fi
-
-    echo "🌍 Regions to query: ${EXPANDED_REGIONS[*]}"
+expand_regions_from_str() {
+  local regions_str="$1"
+  local -a regions_array=()
+  if [ -n "$regions_str" ]; then
+    IFS=',' read -ra regions_array <<< "$(echo "$regions_str" | sed 's/[" ]//g')"
+  fi
+  if [ ${#regions_array[@]} -eq 0 ]; then
+    regions_array=("sa-east-1")
   fi
 
+  EXPANDED_REGIONS=()
+  for region_pattern in "${regions_array[@]}"; do
+    if [[ "$region_pattern" == *"-*" ]]; then
+      base_region="${region_pattern%\*}"
+      case "$base_region" in
+        "us-east-") EXPANDED_REGIONS+=("us-east-1" "us-east-2") ;;
+        "us-west-") EXPANDED_REGIONS+=("us-west-1" "us-west-2") ;;
+        "eu-west-") EXPANDED_REGIONS+=("eu-west-1" "eu-west-2" "eu-west-3") ;;
+        "eu-central-") EXPANDED_REGIONS+=("eu-central-1") ;;
+        "ap-southeast-") EXPANDED_REGIONS+=("ap-southeast-1" "ap-southeast-2") ;;
+        "ap-northeast-") EXPANDED_REGIONS+=("ap-northeast-1" "ap-northeast-2" "ap-northeast-3") ;;
+        "sa-east-") EXPANDED_REGIONS+=("sa-east-1") ;;
+        *) EXPANDED_REGIONS+=("$region_pattern") ;;
+      esac
+    else
+      EXPANDED_REGIONS+=("$region_pattern")
+    fi
+  done
+}
+
+load_steampipe_connections() {
+  local spc_file="${HOME}/.steampipe/config/aws.spc"
+  if [ ! -f "$spc_file" ]; then
+    echo "❌ Steampipe configuration file not found: $spc_file"
+    return 1
+  fi
+
+  CONNECTIONS=()
+  PROFILES_MAP=()
+  REGIONS_MAP=()
+
+  while IFS= read -r conn_line; do
+    connection=$(echo "$conn_line" | sed 's/connection "\(.*\)".*/\1/')
+    profile_line=$(grep -A 20 -F "$conn_line" "$spc_file" | grep 'profile.*=' | head -1)
+    if [ -z "$profile_line" ]; then
+      continue
+    fi
+    profile=$(echo "$profile_line" | sed 's/.*profile.*= "\(.*\)".*/\1/')
+    regions_line=$(grep -A 20 -F "$conn_line" "$spc_file" | grep "regions.*=" | head -1)
+    if [ -n "$regions_line" ]; then
+      regions_str=$(echo "$regions_line" | sed 's/.*regions.*= \[\(.*\)\].*/\1/')
+    else
+      regions_str=""
+    fi
+
+    CONNECTIONS+=("$connection")
+    PROFILES_MAP+=("$profile")
+    REGIONS_MAP+=("$regions_str")
+  done < <(grep '^connection ' "$spc_file")
+
+  if [ ${#CONNECTIONS[@]} -eq 0 ]; then
+    echo "❌ No connections with profile found in aws.spc file"
+    return 1
+  fi
+}
+
+setup_aws_config() {
+  local mode="$1"
+  local -a CONNECTIONS PROFILES_MAP REGIONS_MAP
+
+  load_steampipe_connections || return 1
+
+  if [ "$mode" == "all" ]; then
+    echo "📊 Using all accounts (multi-account mode)"
+    echo "⚠️  Note: In multi-account mode, valid credentials for each account are required"
+    AWS_MULTI_ACCOUNT=true
+    AWS_ALL_CONNECTIONS=("${CONNECTIONS[@]}")
+    AWS_ALL_PROFILES=("${PROFILES_MAP[@]}")
+    AWS_ALL_REGIONS=()
+    for i in "${!CONNECTIONS[@]}"; do
+      expand_regions_from_str "${REGIONS_MAP[$i]}"
+      AWS_ALL_REGIONS+=("${EXPANDED_REGIONS[*]}")
+    done
+    return 0
+  fi
+
+  AWS_MULTI_ACCOUNT=false
+  echo "🔍 Available connections in aws.spc:"
+  for i in "${!CONNECTIONS[@]}"; do
+    echo "$(( i + 1 )): ${CONNECTIONS[$i]}"
+  done
+
+  read -p "Choose the connection number (1-${#CONNECTIONS[@]}): " profile_choice
+  if ! [[ "$profile_choice" =~ ^[0-9]+$ ]] || [ "$profile_choice" -lt 1 ] || [ "$profile_choice" -gt ${#CONNECTIONS[@]} ]; then
+    echo "❌ Invalid choice. Using the first connection."
+    profile_choice=1
+  fi
+
+  AWS_CONNECTION_NAME="${CONNECTIONS[$((profile_choice-1))]}"
+  AWS_PROFILE="${PROFILES_MAP[$((profile_choice-1))]}"
+
+  expand_regions_from_str "${REGIONS_MAP[$((profile_choice-1))]}"
+  AWS_EXPANDED_REGIONS=("${EXPANDED_REGIONS[@]}")
+
   echo "📊 Collecting AWS data"
-  if [ ! -z "$PROFILE" ]; then
-    echo "Using profile: $PROFILE"
+  if [ -n "$AWS_PROFILE" ]; then
+    echo "Using profile: $AWS_PROFILE"
   else
     echo "Using default AWS CLI configuration"
   fi
+  echo "🌍 Regions to query: ${AWS_EXPANDED_REGIONS[*]}"
+}
 
-  # Export variables for use in other functions
-  AWS_PROFILE="$PROFILE"
-  AWS_PROFILE_PARAM="$PROFILE_PARAM"
-  AWS_EXPANDED_REGIONS=("${EXPANDED_REGIONS[@]}")
+ensure_aws_config() {
+  local mode="$1"
+  if [ "$AWS_CONFIG_DONE" = true ] && [ "$AWS_CONFIG_MODE" == "$mode" ]; then
+    return 0
+  fi
+  setup_aws_config "$mode" || return 1
+  AWS_CONFIG_DONE=true
+  AWS_CONFIG_MODE="$mode"
+}
+
+exit_on_expired_token() {
+  local output="$1"
+  if echo "$output" | grep -q "ExpiredTokenException"; then
+    echo "❌ ExpiredTokenException: token expirado. Revalide o token e execute novamente."
+    exit 1
+  fi
 }
 
 run_athena_report() {
@@ -153,78 +185,186 @@ run_athena_report() {
   echo "database,query,executions" > "$ATHENA_CSV"
   > "$ATHENA_TMP"
 
-  for region in "${AWS_EXPANDED_REGIONS[@]}"; do
-    echo "  🌍 Querying region: $region"
-    > /tmp/query_ids_${region}.txt
-    local WORKGROUPS=()
-    local WG_NEXT_TOKEN=""
-    while true; do
-      if [ -z "$WG_NEXT_TOKEN" ]; then
-        wg_resp=$(aws athena list-work-groups $AWS_PROFILE_PARAM --region "$region" --output json 2>>"$LOG_FILE")
-      else
-        wg_resp=$(aws athena list-work-groups $AWS_PROFILE_PARAM --region "$region" --next-token "$WG_NEXT_TOKEN" --output json 2>>"$LOG_FILE")
+  if [ "$AWS_MULTI_ACCOUNT" = true ]; then
+    for i in "${!AWS_ALL_PROFILES[@]}"; do
+      local profile="${AWS_ALL_PROFILES[$i]}"
+      local connection="${AWS_ALL_CONNECTIONS[$i]}"
+      local regions_str="${AWS_ALL_REGIONS[$i]}"
+      local -a regions=()
+      IFS=' ' read -r -a regions <<< "$regions_str"
+      if [ ${#regions[@]} -eq 0 ]; then
+        regions=("sa-east-1")
+      fi
+      echo "🔑 Account: ${connection} (profile: ${profile})"
+      local -a profile_param=()
+      if [ -n "$profile" ]; then
+        profile_param=(--profile "$profile")
       fi
 
-      if [ $? -ne 0 ] || [ -z "$wg_resp" ]; then
-        break
-      fi
+      for region in "${regions[@]}"; do
+        echo "  🌍 Querying region: $region"
+        > /tmp/query_ids_${region}.txt
+        local WORKGROUPS=()
+        local WG_NEXT_TOKEN=""
+        while true; do
+          if [ -z "$WG_NEXT_TOKEN" ]; then
+            wg_resp=$(aws athena list-work-groups "${profile_param[@]}" --region "$region" --output json 2>&1)
+          else
+            wg_resp=$(aws athena list-work-groups "${profile_param[@]}" --region "$region" --next-token "$WG_NEXT_TOKEN" --output json 2>&1)
+          fi
+          if [ $? -ne 0 ]; then
+            echo "$wg_resp" >> "$LOG_FILE"
+            exit_on_expired_token "$wg_resp"
+            break
+          fi
 
-      while IFS= read -r wg_name; do
-        if [ ! -z "$wg_name" ]; then
-          WORKGROUPS+=("$wg_name")
+          while IFS= read -r wg_name; do
+            if [ ! -z "$wg_name" ]; then
+              WORKGROUPS+=("$wg_name")
+            fi
+          done < <(echo "$wg_resp" | jq -r '.WorkGroups[].Name // empty')
+
+          WG_NEXT_TOKEN=$(echo "$wg_resp" | jq -r '.NextToken // empty')
+          if [ -z "$WG_NEXT_TOKEN" ]; then
+            break
+          fi
+        done
+
+        if [ ${#WORKGROUPS[@]} -eq 0 ]; then
+          WORKGROUPS=("primary")
         fi
-      done < <(echo "$wg_resp" | jq -r '.WorkGroups[].Name // empty')
 
-      WG_NEXT_TOKEN=$(echo "$wg_resp" | jq -r '.NextToken // empty')
-      if [ -z "$WG_NEXT_TOKEN" ]; then
-        break
-      fi
+        for workgroup in "${WORKGROUPS[@]}"; do
+          NEXT_TOKEN=""
+          while true; do
+            if [ -z "$NEXT_TOKEN" ]; then
+              resp=$(aws athena list-query-executions "${profile_param[@]}" --region "$region" \
+                --work-group "$workgroup" --max-results 50 --output json 2>&1)
+            else
+              resp=$(aws athena list-query-executions "${profile_param[@]}" --region "$region" \
+                --work-group "$workgroup" --max-results 50 --next-token "$NEXT_TOKEN" --output json 2>&1)
+            fi
+
+            if [ $? -ne 0 ]; then
+              echo "$resp" >> "$LOG_FILE"
+              exit_on_expired_token "$resp"
+              break
+            fi
+
+            echo "$resp" | jq -r '.QueryExecutionIds[]? // empty' >> /tmp/query_ids_${region}.txt
+            NEXT_TOKEN=$(echo "$resp" | jq -r '.NextToken // empty')
+            if [ -z "$NEXT_TOKEN" ]; then
+              break
+            fi
+          done
+        done
+
+        while read -r query_id; do
+          if [ ! -z "$query_id" ] && [ "$query_id" != "None" ]; then
+            query_info=$(aws athena get-query-execution --query-execution-id "$query_id" \
+              "${profile_param[@]}" --region "$region" --output json 2>&1)
+
+            if [ $? -eq 0 ]; then
+              database=$(echo "$query_info" | jq -r '.QueryExecution.QueryExecutionContext.Database // empty')
+              query=$(echo "$query_info" | jq -r '.QueryExecution.Query // empty' | tr '\r\n\t' '   ')
+              if [ ! -z "$query" ]; then
+                printf "%s\t%s\n" "$database" "$query" >> "$ATHENA_TMP"
+              fi
+            else
+              echo "$query_info" >> "$LOG_FILE"
+              exit_on_expired_token "$query_info"
+            fi
+          fi
+        done < /tmp/query_ids_${region}.txt
+
+        rm -f /tmp/query_ids_${region}.txt
+      done
     done
-
-    if [ ${#WORKGROUPS[@]} -eq 0 ]; then
-      WORKGROUPS=("primary")
+  else
+    local -a profile_param=()
+    if [ -n "$AWS_PROFILE" ]; then
+      profile_param=(--profile "$AWS_PROFILE")
     fi
-
-    for workgroup in "${WORKGROUPS[@]}"; do
-      NEXT_TOKEN=""
+    for region in "${AWS_EXPANDED_REGIONS[@]}"; do
+      echo "  🌍 Querying region: $region"
+      > /tmp/query_ids_${region}.txt
+      local WORKGROUPS=()
+      local WG_NEXT_TOKEN=""
       while true; do
-        if [ -z "$NEXT_TOKEN" ]; then
-          resp=$(aws athena list-query-executions $AWS_PROFILE_PARAM --region "$region" \
-            --work-group "$workgroup" --max-results 50 --output json 2>>"$LOG_FILE")
+        if [ -z "$WG_NEXT_TOKEN" ]; then
+          wg_resp=$(aws athena list-work-groups "${profile_param[@]}" --region "$region" --output json 2>&1)
         else
-          resp=$(aws athena list-query-executions $AWS_PROFILE_PARAM --region "$region" \
-            --work-group "$workgroup" --max-results 50 --next-token "$NEXT_TOKEN" --output json 2>>"$LOG_FILE")
+          wg_resp=$(aws athena list-work-groups "${profile_param[@]}" --region "$region" --next-token "$WG_NEXT_TOKEN" --output json 2>&1)
         fi
 
-        if [ $? -ne 0 ] || [ -z "$resp" ]; then
+        if [ $? -ne 0 ]; then
+          echo "$wg_resp" >> "$LOG_FILE"
+          exit_on_expired_token "$wg_resp"
           break
         fi
 
-        echo "$resp" | jq -r '.QueryExecutionIds[]? // empty' >> /tmp/query_ids_${region}.txt
-        NEXT_TOKEN=$(echo "$resp" | jq -r '.NextToken // empty')
-        if [ -z "$NEXT_TOKEN" ]; then
+        while IFS= read -r wg_name; do
+          if [ ! -z "$wg_name" ]; then
+            WORKGROUPS+=("$wg_name")
+          fi
+        done < <(echo "$wg_resp" | jq -r '.WorkGroups[].Name // empty')
+
+        WG_NEXT_TOKEN=$(echo "$wg_resp" | jq -r '.NextToken // empty')
+        if [ -z "$WG_NEXT_TOKEN" ]; then
           break
         fi
       done
-    done
 
-    while read -r query_id; do
-      if [ ! -z "$query_id" ] && [ "$query_id" != "None" ]; then
-        query_info=$(aws athena get-query-execution --query-execution-id "$query_id" \
-          $AWS_PROFILE_PARAM --region "$region" --output json 2>>"$LOG_FILE")
+      if [ ${#WORKGROUPS[@]} -eq 0 ]; then
+        WORKGROUPS=("primary")
+      fi
 
-        if [ $? -eq 0 ]; then
-          database=$(echo "$query_info" | jq -r '.QueryExecution.QueryExecutionContext.Database // empty')
-          query=$(echo "$query_info" | jq -r '.QueryExecution.Query // empty' | tr '\r\n\t' '   ')
-          if [ ! -z "$query" ]; then
-            printf "%s\t%s\n" "$database" "$query" >> "$ATHENA_TMP"
+      for workgroup in "${WORKGROUPS[@]}"; do
+        NEXT_TOKEN=""
+        while true; do
+          if [ -z "$NEXT_TOKEN" ]; then
+            resp=$(aws athena list-query-executions "${profile_param[@]}" --region "$region" \
+              --work-group "$workgroup" --max-results 50 --output json 2>&1)
+          else
+            resp=$(aws athena list-query-executions "${profile_param[@]}" --region "$region" \
+              --work-group "$workgroup" --max-results 50 --next-token "$NEXT_TOKEN" --output json 2>&1)
+          fi
+
+          if [ $? -ne 0 ]; then
+            echo "$resp" >> "$LOG_FILE"
+            exit_on_expired_token "$resp"
+            break
+          fi
+
+          echo "$resp" | jq -r '.QueryExecutionIds[]? // empty' >> /tmp/query_ids_${region}.txt
+          NEXT_TOKEN=$(echo "$resp" | jq -r '.NextToken // empty')
+          if [ -z "$NEXT_TOKEN" ]; then
+            break
+          fi
+        done
+      done
+
+      while read -r query_id; do
+        if [ ! -z "$query_id" ] && [ "$query_id" != "None" ]; then
+          query_info=$(aws athena get-query-execution --query-execution-id "$query_id" \
+            "${profile_param[@]}" --region "$region" --output json 2>&1)
+
+          if [ $? -eq 0 ]; then
+            database=$(echo "$query_info" | jq -r '.QueryExecution.QueryExecutionContext.Database // empty')
+            query=$(echo "$query_info" | jq -r '.QueryExecution.Query // empty' | tr '\r\n\t' '   ')
+            if [ ! -z "$query" ]; then
+              printf "%s\t%s\n" "$database" "$query" >> "$ATHENA_TMP"
+            fi
+          else
+            echo "$query_info" >> "$LOG_FILE"
+            exit_on_expired_token "$query_info"
           fi
         fi
-      fi
-    done < /tmp/query_ids_${region}.txt
+      done < /tmp/query_ids_${region}.txt
 
-    rm -f /tmp/query_ids_${region}.txt
-  done
+      rm -f /tmp/query_ids_${region}.txt
+    done
+  fi
 
   if [ -s "$ATHENA_TMP" ]; then
     awk -F'\t' '{
@@ -253,6 +393,7 @@ run_athena_report() {
   fi
 
   rm -f "$ATHENA_TMP"
+  ATHENA_RAN=true
 }
 
 run_glue_report() {
@@ -261,31 +402,85 @@ run_glue_report() {
 
   echo "name,description,role,created_on,last_modified_on,glue_version,python_version,max_concurrent_runs,worker_type,number_of_workers,max_retries,timeout,job_mode,execution_class,bookmark_option,region" > "$GLUE_CSV"
 
-  for region in "${AWS_EXPANDED_REGIONS[@]}"; do
-    echo "  🌍 Querying region: $region"
-    glue_jobs=$(aws glue get-jobs $AWS_PROFILE_PARAM --region "$region" --output json 2>>"$LOG_FILE")
+  if [ "$AWS_MULTI_ACCOUNT" = true ]; then
+    for i in "${!AWS_ALL_PROFILES[@]}"; do
+      local profile="${AWS_ALL_PROFILES[$i]}"
+      local connection="${AWS_ALL_CONNECTIONS[$i]}"
+      local regions_str="${AWS_ALL_REGIONS[$i]}"
+      local -a regions=()
+      IFS=' ' read -r -a regions <<< "$regions_str"
+      if [ ${#regions[@]} -eq 0 ]; then
+        regions=("sa-east-1")
+      fi
+      echo "🔑 Account: ${connection} (profile: ${profile})"
+      local -a profile_param=()
+      if [ -n "$profile" ]; then
+        profile_param=(--profile "$profile")
+      fi
 
-    if [ $? -eq 0 ] && [ ! -z "$glue_jobs" ]; then
-      echo "$glue_jobs" | jq -r --arg region "$region" '.Jobs[] | [
-        .Name,
-        .Description,
-        .Role,
-        .CreatedOn,
-        .LastModifiedOn,
-        .GlueVersion,
-        .PythonVersion,
-        .MaxConcurrentRuns,
-        .WorkerType,
-        .NumberOfWorkers,
-        .MaxRetries,
-        .Timeout,
-        .JobMode,
-        .ExecutionClass,
-        .JobBookmarkOption,
-        $region
-      ] | @csv' >> "$GLUE_CSV" 2>/dev/null
+      for region in "${regions[@]}"; do
+        echo "  🌍 Querying region: $region"
+        glue_jobs=$(aws glue get-jobs "${profile_param[@]}" --region "$region" --output json 2>&1)
+
+        if [ $? -eq 0 ] && [ ! -z "$glue_jobs" ]; then
+          echo "$glue_jobs" | jq -r --arg region "$region" '.Jobs[] | [
+            .Name,
+            .Description,
+            .Role,
+            .CreatedOn,
+            .LastModifiedOn,
+            .GlueVersion,
+            .PythonVersion,
+            .MaxConcurrentRuns,
+            .WorkerType,
+            .NumberOfWorkers,
+            .MaxRetries,
+            .Timeout,
+            .JobMode,
+            .ExecutionClass,
+            .JobBookmarkOption,
+            $region
+          ] | @csv' >> "$GLUE_CSV" 2>/dev/null
+        else
+          echo "$glue_jobs" >> "$LOG_FILE"
+          exit_on_expired_token "$glue_jobs"
+        fi
+      done
+    done
+  else
+    local -a profile_param=()
+    if [ -n "$AWS_PROFILE" ]; then
+      profile_param=(--profile "$AWS_PROFILE")
     fi
-  done
+    for region in "${AWS_EXPANDED_REGIONS[@]}"; do
+      echo "  🌍 Querying region: $region"
+      glue_jobs=$(aws glue get-jobs "${profile_param[@]}" --region "$region" --output json 2>&1)
+
+      if [ $? -eq 0 ] && [ ! -z "$glue_jobs" ]; then
+        echo "$glue_jobs" | jq -r --arg region "$region" '.Jobs[] | [
+          .Name,
+          .Description,
+          .Role,
+          .CreatedOn,
+          .LastModifiedOn,
+          .GlueVersion,
+          .PythonVersion,
+          .MaxConcurrentRuns,
+          .WorkerType,
+          .NumberOfWorkers,
+          .MaxRetries,
+          .Timeout,
+          .JobMode,
+          .ExecutionClass,
+          .JobBookmarkOption,
+          $region
+        ] | @csv' >> "$GLUE_CSV" 2>/dev/null
+      else
+        echo "$glue_jobs" >> "$LOG_FILE"
+        exit_on_expired_token "$glue_jobs"
+      fi
+    done
+  fi
 
   if [ "$(wc -l < "$GLUE_CSV")" -le 1 ]; then
     echo "🟡 No data found for Glue jobs"
@@ -294,12 +489,17 @@ run_glue_report() {
     linhas=$(( $(wc -l < "$GLUE_CSV") - 1 ))
     echo "✅ OK: aws_glue_job (${linhas} lines)"
   fi
+  GLUE_RAN=true
 }
 
 run_athena_glue_report() {
-  setup_aws_config || return 1
-  run_athena_report
-  run_glue_report
+  ensure_aws_config "$AWS_RUN_MODE" || return 1
+  if [ "$ATHENA_RAN" != true ]; then
+    run_athena_report
+  fi
+  if [ "$GLUE_RAN" != true ]; then
+    run_glue_report
+  fi
 }
 
 # Check options
@@ -338,6 +538,8 @@ done < <(grep -vE '^\s*$|^\s*#' "$TABLE_LIST")
 TOTAL=${#TABLES[@]}
 [ "$TOTAL" -eq 0 ] && { echo "No valid tables in: $TABLE_LIST"; exit 1; }
 
+resume_selected=false
+
 if $single_table; then
   if [ $table_num -gt $TOTAL ]; then
     echo "❌ Table $table_num does not exist. Total: $TOTAL"
@@ -352,6 +554,24 @@ else
     echo "📁 Found CSV files from a previous run in $CSV_DIR"
     read -p "🔄 Resume where you left off? (y/n): " choice
     if [[ "$choice" =~ ^[Yy]$ ]]; then
+      resume_selected=true
+      while true; do
+        echo "🔧 Resume mode:"
+        echo "  1) Continue for all accounts"
+        echo "  2) Continue for one account (choose from list)"
+        read -p "Choose an option (1-2): " resume_mode
+        if [[ "$resume_mode" =~ ^[12]$ ]]; then
+          break
+        fi
+        echo "❌ Invalid option. Choose 1 or 2."
+      done
+
+      if [ "$resume_mode" = "1" ]; then
+        AWS_RUN_MODE="all"
+      else
+        AWS_RUN_MODE="single"
+      fi
+
       # Do not clean
       echo "📋 Total tables: $TOTAL"
       while true; do
@@ -381,6 +601,19 @@ if [ $start_idx -eq 0 ]; then
   > "$LOG_FILE"
 fi
 
+PARTIAL_RUN=false
+if $single_table || [ "$resume_selected" = true ]; then
+  PARTIAL_RUN=true
+fi
+
+if [ "$PARTIAL_RUN" = true ]; then
+  if [ -z "$AWS_RUN_MODE" ] || [ "$AWS_RUN_MODE" != "all" ]; then
+    AWS_RUN_MODE="single"
+  fi
+else
+  AWS_RUN_MODE="all"
+fi
+
 start_all=$(date +%s)
 
 echo "📌 Total tables: $TOTAL"
@@ -389,7 +622,10 @@ echo "🧾 LOG_FILE: $LOG_FILE"
 echo
 
 echo "🧪 Testing Steampipe connection..."
-if ! steampipe query "select 1" > /dev/null 2>>"$LOG_FILE"; then
+sp_err=$(steampipe query "select 1" > /dev/null 2>&1)
+if [ $? -ne 0 ]; then
+  echo "$sp_err" >> "$LOG_FILE"
+  exit_on_expired_token "$sp_err"
   echo "❌ Steampipe connection failed. Check $LOG_FILE"
   exit 1
 fi
@@ -407,7 +643,7 @@ for ((idx=start_idx; idx<end_idx; idx++)); do
 
   # Check for special AWS CLI tables
   if [[ "$table" == "aws_athena_query_execution" ]]; then
-    if ! setup_aws_config; then
+    if ! ensure_aws_config "$AWS_RUN_MODE"; then
       if $force; then
         echo "⚠️ [$idx_display/$TOTAL] AWS config failed for: $table (continuing)"
         continue
@@ -418,7 +654,7 @@ for ((idx=start_idx; idx<end_idx; idx++)); do
     fi
     run_athena_report
   elif [[ "$table" == "aws_glue_job" ]]; then
-    if ! setup_aws_config; then
+    if ! ensure_aws_config "$AWS_RUN_MODE"; then
       if $force; then
         echo "⚠️ [$idx_display/$TOTAL] AWS config failed for: $table (continuing)"
         continue
@@ -437,6 +673,7 @@ for ((idx=start_idx; idx<end_idx; idx++)); do
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
       echo "$error_output" >> "$LOG_FILE"
+      exit_on_expired_token "$error_output"
       if echo "$error_output" | grep -q "AccessDeniedException"; then
         echo "⚠️ [$idx_display/$TOTAL] Access denied on table: $table (skipping)"
         rm -f "$csv_file"
@@ -480,25 +717,19 @@ for ((idx=start_idx; idx<end_idx; idx++)); do
 done
 
 echo
-read -p "📊 Include Athena/Glue report via AWS CLI? (y/n): " include_athena
-if [[ "$include_athena" =~ ^[Yy]$ ]]; then
-  run_athena_glue_report
-fi
+run_athena_glue_report
 
 # Generate summary with CSV names and line counts (without header)
 echo "🧮 Generating line summary..."
 echo "file,lines" > "$RESUMO_CSV"
 
-shopt -s nullglob
 for csv_file in "$CSV_DIR"/*.csv; do
-  if [ -f "$csv_file" ]; then
-    linhas_total=$(wc -l < "$csv_file")
-    linhas=$((linhas_total > 0 ? linhas_total - 1 : 0))
-    nome_arquivo=$(basename "$csv_file")
-    echo "${nome_arquivo},${linhas}" >> "$RESUMO_CSV"
-  fi
+  [ -f "$csv_file" ] || continue
+  linhas_total=$(wc -l < "$csv_file")
+  linhas=$((linhas_total > 0 ? linhas_total - 1 : 0))
+  nome_arquivo=$(basename "$csv_file")
+  echo "${nome_arquivo},${linhas}" >> "$RESUMO_CSV"
 done
-shopt -u nullglob
 
 echo "📝 Summary saved to: $RESUMO_CSV"
 
@@ -508,27 +739,64 @@ echo "📦 Consolidating CSVs into Excel... (this may take a while depending on 
 python3 - <<EOF
 import pandas as pd
 import os
+import sys
+import traceback
 
 csv_dir = "$CSV_DIR"
 xlsx_path = "$OUTPUT_XLSX"
 resumo_path = "$RESUMO_CSV"
+log_path = "$LOG_FILE"
 
 with pd.ExcelWriter(xlsx_path, engine="openpyxl") as writer:
+    used_sheet_names = set()
+
+    def unique_sheet_name(base):
+        base = (base or "sheet")[:31]
+        name = base
+        i = 1
+        while name in used_sheet_names:
+            suffix = f"_{i}"
+            name = (base[: max(0, 31 - len(suffix))] + suffix)
+            i += 1
+        used_sheet_names.add(name)
+        return name
+
     # Write the summary as the first sheet
     try:
         df_resumo = pd.read_csv(resumo_path)
-        df_resumo.to_excel(writer, sheet_name="00_summary", index=False)
+        summary_name = unique_sheet_name("00_summary")
+        df_resumo.to_excel(writer, sheet_name=summary_name, index=False)
+        summary_files = df_resumo["file"].astype(str).tolist()
     except Exception as e:
-        print(f"❗ Error adding summary: {e}")
+        msg = f"❗ Error adding summary: {e}"
+        print(msg)
+        with open(log_path, "a") as log_file:
+            log_file.write(msg + "\n")
+            log_file.write(traceback.format_exc() + "\n")
+        summary_files = []
 
-    # Write remaining CSVs, excluding the summary
-    for csv_file in os.listdir(csv_dir):
-        if csv_file.endswith('.csv') and csv_file != 'resumo_quantidade_linhas.csv':
-            csv_path = os.path.join(csv_dir, csv_file)
-            try:
-                df = pd.read_csv(csv_path)
-                sheet_name = csv_file[:-4][:31]  # remove .csv and truncate to 31 chars
-                df.to_excel(writer, sheet_name=sheet_name, index=False)
-            except Exception as e:
-                print(f"❗ Error processing {csv_file}: {e}")
+    # Write remaining CSVs in the same order as the summary
+    for csv_file in summary_files:
+        if not csv_file.endswith(".csv"):
+            continue
+        if csv_file == "resumo_quantidade_linhas.csv":
+            continue
+        csv_path = os.path.join(csv_dir, csv_file)
+        if not os.path.isfile(csv_path):
+            msg = f"❗ CSV not found: {csv_file}"
+            print(msg)
+            with open(log_path, "a") as log_file:
+                log_file.write(msg + "\n")
+            continue
+        try:
+            df = pd.read_csv(csv_path)
+            base_name = csv_file[:-4]
+            sheet_name = unique_sheet_name(base_name)
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+        except Exception as e:
+            msg = f"❗ Error processing {csv_file}: {e}"
+            print(msg)
+            with open(log_path, "a") as log_file:
+                log_file.write(msg + "\n")
+                log_file.write(traceback.format_exc() + "\n")
 EOF
