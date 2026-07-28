@@ -1,0 +1,455 @@
+{
+  "version": 1,
+  "description": "Primary AWS resources for application and cloud infrastructure discovery. Secondary metadata, tags, metrics, AMIs, network interfaces, listeners, parameter groups and managed prefix lists are intentionally excluded from dashboard and inventory views.",
+  "defaultColumns": [
+    "title",
+    "name",
+    "arn",
+    "status",
+    "state",
+    "account_name",
+    "region",
+    "tag_name",
+    "tag_app",
+    "tag_project",
+    "tag_cost_center",
+    "tag_env"
+  ],
+  "groups": [
+    { "id": "compute", "label": "Compute" },
+    { "id": "network_delivery", "label": "Network & Delivery" },
+    { "id": "storage", "label": "Storage" },
+    { "id": "databases", "label": "Databases" },
+    { "id": "integration", "label": "Integration" },
+    { "id": "security_identity", "label": "Security & Identity" },
+    { "id": "data_analytics", "label": "Data & Analytics" },
+    { "id": "app_services", "label": "Application Services" }
+  ],
+  "resources": {
+    "aws_ec2_instance": {
+      "label": "EC2 Instances",
+      "group": "compute",
+      "columns": ["instance_id", "tag_name", "instance_type", "instance_state", "private_ip_address", "public_ip_address", "vpc_id", "subnet_id", "launch_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ec2_autoscaling_group": {
+      "label": "Auto Scaling Groups",
+      "group": "compute",
+      "columns": ["name", "arn", "status", "desired_capacity", "min_size", "max_size", "availability_zones", "vpc_zone_identifier", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_lambda_function": {
+      "label": "Lambda Functions",
+      "group": "compute",
+      "columns": ["name", "runtime", "state", "handler", "memory_size", "timeout", "role", "last_modified", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ecs_cluster": {
+      "label": "ECS Clusters",
+      "group": "compute",
+      "columns": ["cluster_name", "arn", "status", "running_tasks_count", "pending_tasks_count", "active_services_count", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ecs_service": {
+      "label": "ECS Services",
+      "group": "compute",
+      "columns": ["service_name", "cluster_arn", "status", "desired_count", "running_count", "pending_count", "launch_type", "task_definition", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_eks_cluster": {
+      "label": "EKS Clusters",
+      "group": "compute",
+      "columns": ["name", "arn", "status", "version", "endpoint", "role_arn", "created_at", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_eks_node_group": {
+      "label": "EKS Node Groups",
+      "group": "compute",
+      "columns": ["nodegroup_name", "cluster_name", "status", "instance_types", "capacity_type", "ami_type", "scaling_config", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_app_runner_service": {
+      "label": "App Runner Services",
+      "group": "compute",
+      "columns": ["service_name", "service_arn", "status", "service_url", "created_at", "updated_at", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_batch_queue": {
+      "label": "Batch Queues",
+      "group": "compute",
+      "columns": ["name", "arn", "state", "status", "priority", "compute_environment_order", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_lightsail_instance": {
+      "label": "Lightsail Instances",
+      "group": "compute",
+      "columns": ["name", "arn", "state", "blueprint_id", "bundle_id", "private_ip_address", "public_ip_address", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_elastic_beanstalk_environment": {
+      "label": "Elastic Beanstalk Environments",
+      "group": "compute",
+      "columns": ["environment_name", "application_name", "status", "health", "tier", "endpoint_url", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ec2_application_load_balancer": {
+      "label": "Application Load Balancers",
+      "group": "network_delivery",
+      "columns": ["name", "tag_name", "type", "scheme", "state_code", "dns_name", "vpc_id", "created_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ec2_classic_load_balancer": {
+      "label": "Classic Load Balancers",
+      "group": "network_delivery",
+      "columns": ["name", "tag_name", "dns_name", "scheme", "vpc_id", "availability_zones", "created_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ec2_network_load_balancer": {
+      "label": "Network Load Balancers",
+      "group": "network_delivery",
+      "columns": ["name", "tag_name", "type", "scheme", "state_code", "dns_name", "vpc_id", "created_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ec2_gateway_load_balancer": {
+      "label": "Gateway Load Balancers",
+      "group": "network_delivery",
+      "columns": ["name", "arn", "type", "scheme", "state_code", "dns_name", "vpc_id", "created_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_cloudfront_distribution": {
+      "label": "CloudFront Distributions",
+      "group": "network_delivery",
+      "columns": ["id", "domain_name", "status", "enabled", "http_version", "price_class", "aliases", "origins", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_globalaccelerator_accelerator": {
+      "label": "Global Accelerators",
+      "group": "network_delivery",
+      "columns": ["name", "dns_name", "status", "enabled", "ip_address_type", "created_time", "last_modified_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gateway_rest_api": {
+      "label": "API Gateway REST APIs",
+      "group": "network_delivery",
+      "columns": ["name", "id", "description", "created_date", "endpoint_configuration_types", "api_key_source", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gatewayv2_api": {
+      "label": "API Gateway HTTP/WebSocket APIs",
+      "group": "network_delivery",
+      "columns": ["name", "api_id", "api_endpoint", "protocol_type", "created_date", "route_selection_expression", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gateway_stage": {
+      "label": "API Gateway Stages",
+      "group": "network_delivery",
+      "columns": ["stage_name", "rest_api_id", "deployment_id", "description", "cache_cluster_enabled", "created_date", "last_updated_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gatewayv2_stage": {
+      "label": "API Gateway v2 Stages",
+      "group": "network_delivery",
+      "columns": ["stage_name", "api_id", "deployment_id", "auto_deploy", "created_date", "last_updated_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gateway_domain_name": {
+      "label": "API Gateway Custom Domains",
+      "group": "network_delivery",
+      "columns": ["domain_name", "regional_domain_name", "endpoint_configuration_types", "certificate_arn", "security_policy", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_api_gatewayv2_domain_name": {
+      "label": "API Gateway v2 Custom Domains",
+      "group": "network_delivery",
+      "columns": ["domain_name", "api_mapping_selection_expression", "domain_name_configurations", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_transfer_server": {
+      "label": "Transfer Family Servers",
+      "group": "network_delivery",
+      "columns": ["server_id", "arn", "state", "endpoint_type", "identity_provider_type", "protocols", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_wafv2_web_acl": {
+      "label": "WAFv2 Web ACLs",
+      "group": "network_delivery",
+      "columns": ["name", "id", "description", "scope", "default_action", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_s3_bucket": {
+      "label": "S3 Buckets",
+      "group": "storage",
+      "columns": ["name", "arn", "creation_date", "versioning_enabled", "bucket_policy_is_public", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_efs_file_system": {
+      "label": "EFS File Systems",
+      "group": "storage",
+      "columns": ["name", "file_system_id", "life_cycle_state", "encrypted", "number_of_mount_targets", "performance_mode", "throughput_mode", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_fsx_file_system": {
+      "label": "FSx File Systems",
+      "group": "storage",
+      "columns": ["file_system_id", "arn", "file_system_type", "lifecycle", "storage_capacity", "storage_type", "vpc_id", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_glacier_vault": {
+      "label": "Glacier Vaults",
+      "group": "storage",
+      "columns": ["vault_name", "vault_arn", "creation_date", "number_of_archives", "size_in_bytes", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_dynamodb_table": {
+      "label": "DynamoDB Tables",
+      "group": "databases",
+      "columns": ["name", "table_status", "billing_mode", "item_count", "table_size_bytes", "table_class", "deletion_protection_enabled", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_dynamodb_global_table": {
+      "label": "DynamoDB Global Tables",
+      "group": "databases",
+      "columns": ["name", "arn", "status", "replication_group", "creation_date_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_rds_db_instance": {
+      "label": "RDS Instances",
+      "group": "databases",
+      "columns": ["db_instance_identifier", "tag_name", "status", "class", "engine", "engine_version", "allocated_storage", "multi_az", "publicly_accessible", "storage_encrypted", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_rds_db_cluster": {
+      "label": "RDS Clusters",
+      "group": "databases",
+      "columns": ["db_cluster_identifier", "tag_name", "status", "engine", "engine_version", "engine_mode", "endpoint", "reader_endpoint", "multi_az", "storage_encrypted", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_docdb_cluster": {
+      "label": "DocumentDB Clusters",
+      "group": "databases",
+      "columns": ["db_cluster_identifier", "tag_name", "status", "engine", "engine_version", "endpoint", "reader_endpoint", "storage_encrypted", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_docdb_cluster_instance": {
+      "label": "DocumentDB Instances",
+      "group": "databases",
+      "columns": ["db_instance_identifier", "db_cluster_identifier", "db_instance_class", "engine", "db_instance_status", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_elasticache_cluster": {
+      "label": "ElastiCache Clusters",
+      "group": "databases",
+      "columns": ["cache_cluster_id", "tag_name", "engine", "engine_version", "cache_node_type", "cache_cluster_status", "num_cache_nodes", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_elasticache_replication_group": {
+      "label": "ElastiCache Replication Groups",
+      "group": "databases",
+      "columns": ["replication_group_id", "tag_name", "status", "engine", "cache_node_type", "cluster_enabled", "automatic_failover", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_opensearch_domain": {
+      "label": "OpenSearch Domains",
+      "group": "databases",
+      "columns": ["domain_name", "arn", "processing", "created", "deleted", "endpoint", "engine_version", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_elasticsearch_domain": {
+      "label": "Elasticsearch Domains",
+      "group": "databases",
+      "columns": ["domain_name", "arn", "processing", "created", "deleted", "endpoint", "elasticsearch_version", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_neptune_db_cluster": {
+      "label": "Neptune Clusters",
+      "group": "databases",
+      "columns": ["db_cluster_identifier", "status", "engine", "engine_version", "endpoint", "reader_endpoint", "storage_encrypted", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_memorydb_cluster": {
+      "label": "MemoryDB Clusters",
+      "group": "databases",
+      "columns": ["name", "arn", "status", "node_type", "engine_version", "num_shards", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_keyspaces_keyspace": {
+      "label": "Keyspaces",
+      "group": "databases",
+      "columns": ["keyspace_name", "arn", "replication_strategy", "account_name", "region"]
+    },
+    "aws_keyspaces_table": {
+      "label": "Keyspaces Tables",
+      "group": "databases",
+      "columns": ["keyspace_name", "table_name", "status", "ttl_status", "capacity_specification", "point_in_time_recovery", "account_name", "region"]
+    },
+    "aws_dax_cluster": {
+      "label": "DAX Clusters",
+      "group": "databases",
+      "columns": ["cluster_name", "cluster_arn", "status", "node_type", "total_nodes", "active_nodes", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_redshift_cluster": {
+      "label": "Redshift Clusters",
+      "group": "databases",
+      "columns": ["cluster_identifier", "cluster_status", "node_type", "number_of_nodes", "db_name", "endpoint", "encrypted", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_redshiftserverless_namespace": {
+      "label": "Redshift Serverless Namespaces",
+      "group": "databases",
+      "columns": ["namespace_name", "namespace_arn", "status", "db_name", "creation_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_redshiftserverless_workgroup": {
+      "label": "Redshift Serverless Workgroups",
+      "group": "databases",
+      "columns": ["workgroup_name", "workgroup_arn", "status", "endpoint", "base_capacity", "publicly_accessible", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_timestreamwrite_database": {
+      "label": "Timestream Databases",
+      "group": "databases",
+      "columns": ["database_name", "arn", "creation_time", "last_updated_time", "kms_key_id", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_timestreamwrite_table": {
+      "label": "Timestream Tables",
+      "group": "databases",
+      "columns": ["table_name", "database_name", "arn", "creation_time", "last_updated_time", "table_status", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_sqs_queue": {
+      "label": "SQS Queues",
+      "group": "integration",
+      "columns": ["queue_url", "fifo_queue", "message_retention_seconds", "visibility_timeout_seconds", "sqs_managed_sse_enabled", "kms_master_key_id", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_sns_topic": {
+      "label": "SNS Topics",
+      "group": "integration",
+      "columns": ["topic_arn", "display_name", "subscriptions_confirmed", "subscriptions_pending", "kms_master_key_id", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_eventbridge_bus": {
+      "label": "EventBridge Buses",
+      "group": "integration",
+      "columns": ["name", "arn", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_eventbridge_rule": {
+      "label": "EventBridge Rules",
+      "group": "integration",
+      "columns": ["name", "state", "description", "schedule_expression", "event_bus_name", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_sfn_state_machine": {
+      "label": "Step Functions State Machines",
+      "group": "integration",
+      "columns": ["name", "arn", "status", "type", "creation_date", "role_arn", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_pipes_pipe": {
+      "label": "EventBridge Pipes",
+      "group": "integration",
+      "columns": ["name", "arn", "current_state", "desired_state", "source", "target", "creation_time", "last_modified_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_scheduler_schedule": {
+      "label": "EventBridge Schedules",
+      "group": "integration",
+      "columns": ["name", "arn", "state", "schedule_expression", "target", "creation_date", "last_modification_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_kinesis_stream": {
+      "label": "Kinesis Streams",
+      "group": "integration",
+      "columns": ["stream_name", "stream_arn", "stream_status", "stream_mode_details", "retention_period_hours", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_kinesis_firehose_delivery_stream": {
+      "label": "Kinesis Firehose Streams",
+      "group": "integration",
+      "columns": ["delivery_stream_name", "delivery_stream_arn", "delivery_stream_status", "delivery_stream_type", "destinations", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_msk_cluster": {
+      "label": "MSK Clusters",
+      "group": "integration",
+      "columns": ["cluster_name", "arn", "state", "kafka_version", "number_of_broker_nodes", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_msk_serverless_cluster": {
+      "label": "MSK Serverless Clusters",
+      "group": "integration",
+      "columns": ["cluster_name", "arn", "state", "created_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_mq_broker": {
+      "label": "Amazon MQ Brokers",
+      "group": "integration",
+      "columns": ["broker_name", "broker_id", "broker_state", "engine_type", "engine_version", "deployment_mode", "host_instance_type", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_dms_endpoint": {
+      "label": "DMS Endpoints",
+      "group": "integration",
+      "columns": ["endpoint_identifier", "endpoint_type", "engine_name", "status", "server_name", "database_name", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_dms_replication_instance": {
+      "label": "DMS Replication Instances",
+      "group": "integration",
+      "columns": ["replication_instance_identifier", "replication_instance_class", "replication_instance_status", "allocated_storage", "multi_az", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_dms_replication_task": {
+      "label": "DMS Replication Tasks",
+      "group": "integration",
+      "columns": ["replication_task_identifier", "status", "migration_type", "source_endpoint_arn", "target_endpoint_arn", "replication_instance_arn", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_secretsmanager_secret": {
+      "label": "Secrets Manager Secrets",
+      "group": "security_identity",
+      "columns": ["name", "description", "rotation_enabled", "last_accessed_date", "last_changed_date", "primary_region", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_directory_service_directory": {
+      "label": "Directory Service Directories",
+      "group": "security_identity",
+      "columns": ["directory_id", "name", "type", "size", "stage", "launch_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_cognito_user_pool": {
+      "label": "Cognito User Pools",
+      "group": "security_identity",
+      "columns": ["name", "id", "arn", "status", "creation_date", "last_modified_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_cognito_identity_pool": {
+      "label": "Cognito Identity Pools",
+      "group": "security_identity",
+      "columns": ["identity_pool_name", "identity_pool_id", "allow_unauthenticated_identities", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_acm_certificate": {
+      "label": "ACM Certificates",
+      "group": "security_identity",
+      "columns": ["domain_name", "certificate_arn", "status", "type", "not_after", "in_use_by", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_athena_workgroup": {
+      "label": "Athena Workgroups",
+      "group": "data_analytics",
+      "columns": ["name", "state", "description", "creation_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_glue_catalog_database": {
+      "label": "Glue Databases",
+      "group": "data_analytics",
+      "columns": ["name", "description", "location_uri", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_glue_catalog_table": {
+      "label": "Glue Tables",
+      "group": "data_analytics",
+      "columns": ["name", "database_name", "table_type", "owner", "create_time", "update_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_glue_crawler": {
+      "label": "Glue Crawlers",
+      "group": "data_analytics",
+      "columns": ["name", "state", "database_name", "role", "schedule", "creation_time", "last_updated", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_glue_job": {
+      "label": "Glue Jobs",
+      "group": "data_analytics",
+      "columns": ["name", "role", "command", "created_on", "last_modified_on", "glue_version", "max_capacity", "worker_type", "number_of_workers", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_emr_cluster": {
+      "label": "EMR Clusters",
+      "group": "data_analytics",
+      "columns": ["id", "name", "status_state", "normalized_instance_hours", "release_label", "master_public_dns_name", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_lakeformation_resource": {
+      "label": "Lake Formation Resources",
+      "group": "data_analytics",
+      "columns": ["resource_arn", "role_arn", "last_modified", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_amplify_app": {
+      "label": "Amplify Apps",
+      "group": "app_services",
+      "columns": ["name", "app_id", "arn", "default_domain", "platform", "repository", "create_time", "update_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_appsync_graphql_api": {
+      "label": "AppSync GraphQL APIs",
+      "group": "app_services",
+      "columns": ["name", "api_id", "arn", "uris", "authentication_type", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ecr_repository": {
+      "label": "ECR Repositories",
+      "group": "app_services",
+      "columns": ["repository_name", "repository_uri", "created_at", "image_tag_mutability", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ecrpublic_repository": {
+      "label": "ECR Public Repositories",
+      "group": "app_services",
+      "columns": ["repository_name", "repository_uri", "created_at", "account_name", "region"]
+    },
+    "aws_ses_domain_identity": {
+      "label": "SES Domain Identities",
+      "group": "app_services",
+      "columns": ["identity", "verification_status", "dkim_enabled", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_ses_email_identity": {
+      "label": "SES Email Identities",
+      "group": "app_services",
+      "columns": ["identity", "verification_status", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_pinpoint_app": {
+      "label": "Pinpoint Apps",
+      "group": "app_services",
+      "columns": ["name", "id", "arn", "creation_date", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_serverlessapplicationrepository_application": {
+      "label": "Serverless Application Repository Apps",
+      "group": "app_services",
+      "columns": ["name", "application_id", "arn", "description", "creation_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    },
+    "aws_media_store_container": {
+      "label": "MediaStore Containers",
+      "group": "app_services",
+      "columns": ["name", "arn", "endpoint", "status", "creation_time", "account_name", "region", "tag_app", "tag_project", "tag_cost_center", "tag_env"]
+    }
+  }
+}

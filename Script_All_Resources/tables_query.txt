@@ -79,7 +79,6 @@ aws_ec2_classic_load_balancer
 aws_ec2_client_vpn_endpoint
 aws_ec2_gateway_load_balancer
 aws_ec2_instance
-aws_ec2_instance_availability
 aws_ec2_instance_type
 aws_ec2_key_pair
 aws_ec2_launch_configuration
