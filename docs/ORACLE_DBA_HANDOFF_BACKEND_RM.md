@@ -15,6 +15,8 @@ blocked outside the DBA physical v1 object-creation scope.
 - Physical DDL and rollback scripts for DBA/RM approval.
 - Approved Oracle `CA_DISC_LIFT_*` physical base executed in the current
   Autonomous Database via the runtime connection alias `cloudarchdb_high`.
+- Backend physical handoff for the next implementation slice:
+  `docs/ORACLE_DBA_PHYSICAL_HANDOFF_BACKEND_2026-08-12.md`.
 
 No application code path was deployed or connected to the new objects. No
 grants, deploy, restart, collection, Moinhos reprocessing, endpoint exposure, or
