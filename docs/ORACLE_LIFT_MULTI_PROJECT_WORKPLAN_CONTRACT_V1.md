@@ -1,13 +1,16 @@
 # Oracle Lift Multi-Project Workplan Contract v1
 
-Status: SANITIZED_LOGICAL_CONTRACT_ONLY / HOLD
+Status: ORACLE_PHYSICAL_V1_READY / BACKEND_RM_PENDING
 
 Issue: `#203`
 
-This addendum extends the Discovery/Lift Oracle logical contract for the
-`Preparar Workplan` flow. It defines a server-only multi-project job contract.
-It does not authorize physical Oracle objects, DDL, DML, grants, deploy,
-collection, reprocessing, secret access, wallet access, or customer data reads.
+This addendum extends the Discovery/Lift Oracle contract for the
+`Preparar Workplan` flow. It defines a server-only multi-project job contract
+and records the first approved `CA_DISC_LIFT_*` physical base.
+
+It does not authorize additional DDL, grants, deploy, collection, Moinhos
+reprocessing, customer-content reads, or direct table DML outside the approved
+package boundary.
 
 ## Goal
 
@@ -27,10 +30,10 @@ The endpoint names below are logical. They are not deployed routes.
 
 | Endpoint | Purpose | Physical status |
 |---|---|---|
-| `GET /api/lift/workplan/active-projects?client_id=&provider=` | List active projects eligible for selection | PENDING_DBA_BE |
-| `POST /api/lift/workplan/prepare` | Create or return one server-side run for the selected project set | PENDING_DBA_BE |
-| `GET /api/lift/workplan/runs/{run_id}` | Return sanitized status/projection for polling | PENDING_DBA_BE |
-| `GET /api/lift/workplan/runs/{run_id}/events?cursor=` | Return sanitized incremental journal events | PENDING_DBA_BE |
+| `GET /api/lift/workplan/active-projects?client_id=&provider=` | List active projects eligible for selection | ORACLE_TABLE_READY / BE_ROUTE_PENDING |
+| `POST /api/lift/workplan/prepare` | Create or return one server-side run for the selected project set | ORACLE_PACKAGE_READY / BE_ROUTE_PENDING |
+| `GET /api/lift/workplan/runs/{run_id}` | Return sanitized status/projection for polling | BE_PROJECTION_PENDING |
+| `GET /api/lift/workplan/runs/{run_id}/events?cursor=` | Return sanitized incremental journal events | ORACLE_JOURNAL_READY / BE_ROUTE_PENDING |
 
 ## Prepare Input
 
@@ -296,46 +299,52 @@ Recommended DBA mechanisms:
 - Stored API validation.
 - DBA-approved equivalent.
 
-Until DBA approves a physical mechanism, this remains HOLD.
+The v1 execution enforces logical isolation through required scope columns and
+package parameters. VPD/application context is not created yet and remains a
+hardening gap for any split-user or broader runtime access model.
 
-## Backend Fake-Only Pre-Edit Allowed
+## Backend Implementation Allowed
 
 Backend may implement:
 
-- fake active-projects projection;
-- fake prepare-workplan job adapter;
+- active-projects projection against `CA_DISC_LIFT_PROJECTS`;
+- prepare-workplan adapter against `CA_DISC_LIFT_API`;
 - DTO model and JSON schema validation;
-- in-memory journal for tests;
+- journal polling against `CA_DISC_LIFT_JOURNAL`;
+- in-memory/fake path for tests;
 - deterministic idempotency for synthetic inputs;
 - feature flag default OFF;
-- fail-closed guards before fake write/job dispatch;
+- fail-closed guards before write/job dispatch;
 - tests for empty selection, duplicate ids, cross-client ids, inactive projects,
   unauthorized provider, replay, retry, rollback marker, and renderer no-sum.
 
 Backend must not implement:
 
-- real Oracle pool;
-- real secret or wallet use;
-- real writer/journal/projection binding;
-- real artifact generation for Moinhos;
-- reprocessing;
-- DDL/DML/grants;
-- deploy or restart.
+- deploy/restart without RM;
+- additional DDL/grants;
+- direct table DML from web handlers outside `CA_DISC_LIFT_API`;
+- real artifact generation for Moinhos without workflow authorization;
+- reprocessing without explicit reason-coded authorization.
 
 ## DBA / Infra Gaps
 
-Required before real integration:
+Completed for Oracle physical v1:
 
-- Confirm whether existing Autonomous is approved for Discovery/Lift.
-- Approve separate Discovery/Lift owner/schema or equivalent.
-- Approve active-projects projection.
-- Approve prepare-workplan writer API.
-- Approve append-only journal.
-- Approve run status/projection API.
-- Approve artifact registry metadata-only surface.
-- Approve VPD/application context or equivalent.
-- Approve runtime grants.
-- Approve secret reference, endpoint alias, wallet reference, and pool limits.
-- Approve read-only Oracle healthcheck.
+- Current Autonomous/schema approved for this `CA_DISC_LIFT_*` scope.
+- No separate schema or tablespace change.
+- Active-projects table approved: `CA_DISC_LIFT_PROJECTS`.
+- Prepare-workplan writer package approved: `CA_DISC_LIFT_API`.
+- Append-only journal table approved: `CA_DISC_LIFT_JOURNAL`.
+- Artifact registry approved: `CA_DISC_LIFT_ARTIFACTS`.
+- Endpoint alias approved for this execution: `cloudarchdb_high`.
+- Read-only healthcheck approved: mTLS wallet/TNS plus `dual`.
 
-Without those approvals, the lane remains HOLD.
+Remaining gaps:
+
+- Backend route/API and DTO publication.
+- Public run status/projection endpoint.
+- Pool limits and circuit breaker implementation.
+- VPD/application context or equivalent for future split-user hardening.
+- Runtime grants if a separate runtime user is introduced.
+- Resources, dependency graph, value/cost, files metadata, and runtime progress
+  producers.

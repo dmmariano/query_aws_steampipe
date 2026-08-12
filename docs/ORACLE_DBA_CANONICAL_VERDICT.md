@@ -1,11 +1,12 @@
 # Oracle DBA / Data Architecture Canonical Verdict
 
-Status: HOLD
+Status: PARTIAL
 
 This is the canonical Oracle DBA/Data Architecture position for the
-Cloud Architect Discovery/Lift Oracle-first workstream. It is a sanitized
-architecture and authorization contract placeholder. It is not a DBA physical
-contract, not a deployment candidate, and not evidence of production data.
+Cloud Architect Discovery/Lift Oracle-first workstream. It records the
+sanitized logical contract and the approved Oracle physical base created for
+the first Lift multi-project contract. It is not a deployment candidate and not
+evidence of production data.
 
 ## Scope
 
@@ -17,9 +18,10 @@ Applies to:
 - Writer, journal, projection/API incremental, DTOs, run-control, grants,
   pool, healthcheck, and data governance.
 
-Does not authorize:
+Still does not authorize:
 
-- DDL, DML, grants, deploy, restart, collection, reprocessing, or data reads.
+- Additional DDL, DML outside the approved package, grants, deploy, restart,
+  collection, reprocessing, or customer data reads.
 - Plaintext secrets, wallet content, full endpoints, sensitive OCIDs, customer
   content, or real object names not explicitly DBA-approved.
 - Use of local Mac, local CSV, local SQLite, local query_aws, or local tests as
@@ -29,18 +31,20 @@ Does not authorize:
 
 | Item | Position |
 |---|---|
-| Overall status | HOLD |
-| Physical DBA contract | MISSING |
-| Existing Autonomous authorization for Discovery/Lift | NOT_CONFIRMED |
-| Physical names | No DBA-approved schema/package/view/grant names |
-| Backend allowed now | Fake-only artifacts, default OFF, sanitized logical contract |
-| Runtime Oracle pool | BLOCKED |
-| Real integration | BLOCKED |
-| Data operations | BLOCKED |
+| Overall status | PARTIAL |
+| Physical DBA contract | EXECUTED_FOR_CA_DISC_LIFT_V1 |
+| Existing Autonomous authorization for Discovery/Lift | CONFIRMED_FOR_THIS_SCOPE |
+| Physical schema | Connected runtime schema in the current Autonomous Database |
+| Tablespace | Not changed, not required for this approval |
+| Physical names | `CA_DISC_LIFT_PROJECTS`, `CA_DISC_LIFT_RUNS`, `CA_DISC_LIFT_JOURNAL`, `CA_DISC_LIFT_ARTIFACTS`, `CA_DISC_LIFT_API`, approved indexes |
+| Backend allowed now | Real adapter preparation against approved package/object contract, feature-gated/default OFF |
+| Runtime Oracle pool | PENDING_BACKEND_RM |
+| Real integration | PENDING_BACKEND_RM_DEPLOY |
+| Data operations | No customer-content read or Moinhos reprocessing without separate workflow authorization |
 
 ## Server-Side Evidence Summary
 
-Read-only server inspection on 2026-08-11 confirmed:
+Server inspection and DBA execution on 2026-08-11 confirmed:
 
 - Hosted runtime `oracle-ai` is reachable and healthy.
 - `/srv/cloud-architect/app` is present with service user/group
@@ -48,12 +52,17 @@ Read-only server inspection on 2026-08-11 confirmed:
 - Runtime is `NO_GIT_REPO`.
 - `oracledb` is present in the app venv.
 - ADB wallet references and wallet files are present.
-- OCI CLI/config are missing on the host.
-- Discovery/Lift DSN, secret references, pool settings, Oracle healthcheck,
-  writer, journal, projection/API, and DTO contract remain missing.
+- ADB connection using `cloudarchdb_high` succeeded.
+- Approved `CA_DISC_LIFT_*` tables, indexes, package, and package body were
+  created and validated.
+- Created tables were empty immediately after DDL execution.
+- OCI CLI/config are not required for this database DDL path.
+- Backend route/API, runtime pool wiring, DTO publication, and RM deploy remain
+  pending.
 
 Detailed sanitized evidence is recorded in
-`docs/ORACLE_SERVER_READONLY_EVIDENCE_2026-08-11.md`.
+`docs/ORACLE_SERVER_READONLY_EVIDENCE_2026-08-11.md` and
+`docs/ORACLE_DISCOVERY_LIFT_DDL_EXECUTION_EVIDENCE_2026-08-11.md`.
 
 ## Lift Multi-Project Addendum
 
@@ -71,13 +80,15 @@ Detailed contract is recorded in
 
 ## Canonical Architecture Position
 
-The existing Autonomous Database may be used for Discovery/Lift only if DBA/Infra
-explicitly confirms it as authorized for this operational domain. If approved,
-Discovery/Lift must be logically separated from the Knowledge/RAG domain.
+The current Autonomous Database is approved for this Discovery/Lift v1 scope.
+The first physical contract uses the connected runtime schema in the same
+Autonomous Database. Schema is a logical namespace/owner; tablespace is storage
+allocation. No tablespace change was requested or performed.
 
 Required separation:
 
-- Use a separate Discovery/Lift owner/schema or DBA-approved equivalent.
+- Use `CA_DISC_LIFT_*` object prefixes plus mandatory logical scope columns:
+  `client_id`, `provider`, `environment`, and `project_id`.
 - Do not use `ca_knowledge_*`, vector indexes, or RAG storage as operational
   source of truth for Discovery/Lift.
 - Treat Knowledge/RAG as a consumer or adjacent domain only when an explicit
@@ -85,57 +96,57 @@ Required separation:
 
 ## Required DBA Physical Contract
 
-DBA/Infra must return a sanitized contract containing DBA-approved values or
-aliases for:
+The approved v1 physical contract contains:
 
-- Discovery/Lift owner/schema.
-- Writer package/procedure for batch metadata-only ingestion.
-- Append-only journal/run events object or API.
-- Projection/view/API incremental by `client_id + provider + project_id`.
-- Resources projection.
-- Dependency graph projection for account-account, app-app, and app-database.
-- Value/cost projection.
-- Files metadata-only projection.
-- Runtime progress/events projection.
-- Grants model with runtime least privilege.
-- Isolation mechanism, such as VPD, application context, or DBA-approved
-  equivalent.
-- Secret reference, endpoint alias, wallet/TLS reference, pool settings, and
-  read-only healthcheck method.
+- Connected runtime schema in current Autonomous Database.
+- Endpoint alias `cloudarchdb_high`.
+- Tables: `CA_DISC_LIFT_PROJECTS`, `CA_DISC_LIFT_RUNS`,
+  `CA_DISC_LIFT_JOURNAL`, `CA_DISC_LIFT_ARTIFACTS`.
+- Indexes: `CA_DISC_LIFT_PROJECTS_SCOPE_IX`, `CA_DISC_LIFT_RUNS_SCOPE_IX`,
+  `CA_DISC_LIFT_JOURNAL_CURSOR_IX`.
+- Package: `CA_DISC_LIFT_API`.
+- Rollback script restricted to the same `CA_DISC_LIFT_*` objects.
 
-Until those values are explicitly DBA-approved, physical names remain
-`DBA_APPROVED_*` placeholders and must not be inferred.
+Remaining DBA/Architecture gaps:
+
+- VPD/application-context policy is not created.
+- Grants are not created because runtime currently uses the connected schema.
+- Public projection/read procedures are still a Backend/API contract gap.
+- Resources, dependency graph, value/cost, files metadata, and runtime progress
+  domain producers are not populated.
+- Operational pool limits must be implemented by Backend/RM.
+- Any hardening DDL beyond this v1 object list requires a new explicit gate.
 
 ## Backend Boundary
 
-Backend may implement only:
+Backend may now implement:
 
-- Adapter and DTO code behind feature flag default OFF.
-- Fake Oracle tests and fixtures with no real credentials or data.
+- Adapter and DTO code against `CA_DISC_LIFT_API`, behind feature flag default
+  OFF until RM approval.
+- Fake Oracle tests and fixtures with no real credentials or customer data.
 - Sanitized JSON contracts.
 - Fail-closed guards before pool/query/write.
-- Idempotency and run-control simulation.
+- Idempotency and run-control mapping to the approved objects.
 - Sentinels against CSV, pandas, SQLite, dual-read, local artifacts, and local
   query_aws as production path.
 
 Backend must not implement:
 
-- Real pool configuration.
-- DDL/DML.
+- Additional DDL/DML.
 - Direct grants.
-- Physical schema/object names.
-- Real writer/journal/projection bindings.
-- Runtime deploy.
+- Runtime deploy without RM.
+- Customer-content reads or Moinhos reprocessing without explicit workflow
+  authorization.
 
 ## RM / Dispatcher Boundary
 
-RM may proceed only after all are true:
+RM may proceed to a deploy review only after all are true:
 
-- DBA/Infra provides the sanitized physical contract.
 - Backend provides SHA/base/parent/ref, branch/worktree, claims, gates, and
   rollback.
 - Runtime target has a traceable base or deployment package.
-- Secret reference, wallet/TLS, endpoint alias, pool limits, and healthcheck
-  method are authorized without exposing secret content.
+- Pool limits, healthcheck method, rollback, and default-OFF feature gate are
+  present without exposing secret content.
 
-Dispatcher must keep this workstream in HOLD until that condition is met.
+Dispatcher should move this from DBA physical HOLD to Backend/RM implementation
+pending.

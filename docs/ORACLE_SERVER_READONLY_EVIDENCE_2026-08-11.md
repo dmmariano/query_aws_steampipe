@@ -94,7 +94,7 @@ Discovery/Lift writer contract.
 | `discovery_oracle_p0_v1.schema.json` | MISSING |
 | `discovery_oracle_runtime_progress_v1.schema.json` | MISSING |
 
-## Canonical Conclusion
+## Historical Conclusion
 
 Server-side evidence improves the status from "wallet unknown" to "wallet
 material present", but the overall DBA/Architecture verdict remains HOLD:
@@ -112,3 +112,12 @@ material present", but the overall DBA/Architecture verdict remains HOLD:
 
 No real integration should proceed until DBA/Infra provides a sanitized physical
 contract and Git/RM provides a traceable deployment base.
+
+## Superseding Event
+
+Later on 2026-08-11, DBA execution was explicitly approved for the current
+Autonomous Database using the runtime connection alias `cloudarchdb_high`.
+The approved `CA_DISC_LIFT_*` physical base was created and validated.
+
+Current execution evidence is recorded in
+`docs/ORACLE_DISCOVERY_LIFT_DDL_EXECUTION_EVIDENCE_2026-08-11.md`.

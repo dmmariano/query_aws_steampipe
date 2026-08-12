@@ -38,7 +38,7 @@
           "enum": ["NOT_CONFIRMED", "APPROVED", "REJECTED"]
         },
         "physical_contract_status": {
-          "enum": ["MISSING", "DBA_APPROVED"]
+          "enum": ["MISSING", "DBA_APPROVED", "DBA_EXECUTED"]
         },
         "secret_plaintext_allowed": {
           "const": false
@@ -140,10 +140,10 @@
       "required": ["runtime_write", "runtime_read", "ddl_allowed"],
       "properties": {
         "runtime_write": {
-          "enum": ["EXECUTE_ONLY_ON_DBA_APPROVED_API", "PENDING_DBA"]
+          "enum": ["EXECUTE_ONLY_ON_DBA_APPROVED_API", "EXECUTE_ON_CA_DISC_LIFT_API", "PENDING_DBA"]
         },
         "runtime_read": {
-          "enum": ["SELECT_ONLY_ON_DBA_APPROVED_PROJECTIONS", "PENDING_DBA"]
+          "enum": ["SELECT_ONLY_ON_DBA_APPROVED_PROJECTIONS", "SELECT_ON_CA_DISC_LIFT_APPROVED_OBJECTS", "PENDING_DBA"]
         },
         "ddl_allowed": {
           "const": false
@@ -197,7 +197,7 @@
         "allowed_levels": {
           "type": "array",
           "items": {
-            "enum": ["config_only", "import_only", "wallet_metadata", "pool_config_parse"]
+            "enum": ["config_only", "import_only", "wallet_metadata", "pool_config_parse", "dual_readonly"]
           }
         },
         "query_real_data_allowed": {
@@ -211,13 +211,13 @@
       "required": ["fake_only_allowed", "feature_flag_default", "real_integration_allowed"],
       "properties": {
         "fake_only_allowed": {
-          "const": true
+          "type": "boolean"
         },
         "feature_flag_default": {
           "const": "OFF"
         },
         "real_integration_allowed": {
-          "const": false
+          "type": "boolean"
         }
       }
     }
@@ -229,11 +229,11 @@
       "required": ["status", "physical_name"],
       "properties": {
         "status": {
-          "enum": ["PENDING_DBA", "DBA_APPROVED"]
+          "enum": ["PENDING_DBA", "DBA_APPROVED", "DBA_EXECUTED"]
         },
         "physical_name": {
           "type": "string",
-          "pattern": "^(DBA_APPROVED_|PENDING_DBA).+"
+          "pattern": "^(DBA_APPROVED_|PENDING_DBA|CA_DISC_LIFT_).+"
         }
       }
     },

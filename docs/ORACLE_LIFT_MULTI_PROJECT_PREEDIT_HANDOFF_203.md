@@ -2,11 +2,12 @@
 
 Issue: `#203`
 
-Status: BACKLOG / HOLD_EXTERNAL_DATA_ARCHITECTURE
+Status: BACKLOG / ORACLE_PHYSICAL_V1_READY / BACKEND_RM_PENDING
 
 This handoff defines the safe pre-edit boundary for the `Preparar Workplan`
-multi-project flow. It is intended for Backend and UX planning. It is not a
-runtime implementation and not a DBA physical contract.
+multi-project flow. It is intended for Backend and UX planning. The Oracle
+physical v1 base now exists; this is still not a runtime implementation or RM
+deploy approval.
 
 ## Objective
 
@@ -30,32 +31,31 @@ files or trigger reprocessing.
 
 ## Backend Claims For Future Pre-Edit
 
-Allowed fake-only/default OFF claims:
+Allowed default-OFF claims:
 
 - DTO model for active projects.
 - DTO model for prepare-workplan response.
-- Fake active-projects store.
-- Fake prepare-workplan service.
-- In-memory append-only journal for tests.
+- Active-projects adapter against `CA_DISC_LIFT_PROJECTS`.
+- Prepare-workplan service against `CA_DISC_LIFT_API`.
+- Append-only journal polling against `CA_DISC_LIFT_JOURNAL`.
+- Fake/in-memory stores for tests.
 - Deterministic idempotency for canonical `project_ids[]`.
-- Fail-closed scope validation before fake job creation.
+- Fail-closed scope validation before job creation.
 - Feature flag default OFF.
 - Tests for project selection and renderer contract.
 
 Blocked claims:
 
-- Oracle physical pool.
-- DBA object names.
 - Grants.
-- DDL/DML.
-- Real writer/journal/projection.
+- Additional DDL.
+- Direct table DML outside `CA_DISC_LIFT_API`.
 - Real artifact generation or storage writes.
 - Moinhos reprocessing.
 - Deploy/RM.
 
 ## UX Claims For Future Pre-Edit
 
-Allowed fake-only/default OFF claims:
+Allowed default-OFF claims:
 
 - Modal or selection control backed by server DTO.
 - Disabled state for blocked/ineligible projects using reason codes.
@@ -87,31 +87,28 @@ Minimum gates:
 
 ## Rollback
 
-For future fake-only code:
+For future pre-edit code:
 
 - Feature flag OFF.
 - `git revert <candidate_sha>`.
 - No data rollback because real data operations remain prohibited.
 
-For future real integration:
+For deployed real integration:
 
 - DBA-approved logical rollback by `run_id`.
 - RM release restore.
 - No destructive delete as default rollback.
 
-## Exit Criteria From HOLD
+## Remaining Exit Criteria
 
-This lane can leave Data Architecture HOLD only when DBA/Infra provides a
-sanitized physical contract for:
+Data Architecture object-absence HOLD is removed for the v1 Oracle base.
+Backend/RM still need:
 
-- active projects projection;
-- prepare-workplan writer API;
-- append-only journal;
+- active projects route/API;
+- prepare-workplan route/API;
 - run status/projection API;
-- artifact registry metadata-only references;
-- isolation mechanism;
-- grants;
-- secret reference;
-- endpoint alias;
+- DTO publication;
 - pool limits;
-- read-only healthcheck.
+- circuit breaker/timeouts;
+- RM deploy gate;
+- optional VPD/application context or split grants for the next hardening step.

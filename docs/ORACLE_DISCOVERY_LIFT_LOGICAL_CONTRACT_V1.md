@@ -1,45 +1,62 @@
 # Oracle Discovery/Lift Logical Contract v1
 
-Status: SANITIZED_LOGICAL_CONTRACT_ONLY
+Status: PARTIAL_PHYSICAL_CONTRACT_READY
 
 This document defines the logical contract expected by Backend, RM, and DBA for
-the Discovery/Lift Oracle-first path. It deliberately uses placeholders instead
-of physical object names.
+the Discovery/Lift Oracle-first path. The first physical base for the Lift
+multi-project Workplan contract now exists in the connected runtime schema of
+the current Autonomous Database.
 
 ## Domains
 
 | Domain | Logical contract | Physical status |
 |---|---|---|
-| Tenant scope | `client_id`, `project_id`, `provider`, `environment` | PENDING_DBA |
-| Run-control | run lifecycle and batch lifecycle | PENDING_DBA |
-| Writer | metadata-only batch publish API | PENDING_DBA |
-| Journal | append-only run/event log | PENDING_DBA |
-| Projection | incremental read model by scope and cursor | PENDING_DBA |
-| DTO | public sanitized Lift payload | PENDING_DBA |
+| Tenant scope | `client_id`, `project_id`, `provider`, `environment` | READY_CA_DISC_LIFT_V1 |
+| Active projects | selectable project registry | READY_CA_DISC_LIFT_V1 |
+| Run-control | run lifecycle and batch lifecycle | READY_CA_DISC_LIFT_V1 |
+| Writer | metadata-only run/event/artifact package API | READY_CA_DISC_LIFT_V1 |
+| Journal | append-only run/event log | READY_CA_DISC_LIFT_V1 |
+| Projection | incremental read model by scope and cursor | PENDING_BACKEND_API |
+| DTO | public sanitized Lift payload | PENDING_BACKEND_API |
 | Resources | inventory resources read model | PENDING_DBA |
 | Dependencies | account-account, app-app, app-database graph | PENDING_DBA |
 | Value/cost | aggregated value and cost metrics | PENDING_DBA |
 | Files | metadata-only file records, no content | PENDING_DBA |
-| Progress/events | runtime progress and public state | PENDING_DBA |
+| Progress/events | runtime progress and public state | PARTIAL_CA_DISC_LIFT_JOURNAL |
 
-## Placeholder Objects
+## Physical Contract V1
 
-The following aliases are placeholders. They are not object names.
+The following physical names are DBA-approved for v1 and were created in the
+connected runtime schema. Schema is the connected database owner namespace;
+tablespace was not changed.
+
+| Physical name | Purpose |
+|---|---|
+| `CA_DISC_LIFT_PROJECTS` | active/eligible project registry by tenant scope |
+| `CA_DISC_LIFT_RUNS` | run-control and idempotency |
+| `CA_DISC_LIFT_JOURNAL` | append-only event journal |
+| `CA_DISC_LIFT_ARTIFACTS` | opaque artifact references |
+| `CA_DISC_LIFT_PROJECTS_SCOPE_IX` | project selection lookup |
+| `CA_DISC_LIFT_RUNS_SCOPE_IX` | run polling lookup |
+| `CA_DISC_LIFT_JOURNAL_CURSOR_IX` | incremental journal cursor lookup |
+| `CA_DISC_LIFT_API` | approved package boundary for run/event/artifact writes |
+
+Endpoint alias: `cloudarchdb_high`.
+
+## Remaining Placeholder Contracts
+
+The following aliases remain placeholders until Backend/RM/DBA provide the next
+approved contract.
 
 | Placeholder | Meaning |
 |---|---|
-| `DBA_APPROVED_DISCOVERY_LIFT_OWNER` | DBA-approved logical owner/schema |
-| `DBA_APPROVED_WRITER_API` | DBA-approved package/procedure for writes |
-| `DBA_APPROVED_JOURNAL_OBJECT` | DBA-approved append-only journal surface |
-| `DBA_APPROVED_PROJECTION_API` | DBA-approved incremental projection surface |
-| `DBA_APPROVED_RUNTIME_PROGRESS_API` | DBA-approved runtime progress surface |
-| `DBA_APPROVED_RESOURCE_PROJECTION` | DBA-approved resources projection |
-| `DBA_APPROVED_DEPENDENCY_PROJECTION` | DBA-approved dependency graph projection |
-| `DBA_APPROVED_VALUE_COST_PROJECTION` | DBA-approved value/cost projection |
-| `DBA_APPROVED_FILES_METADATA_PROJECTION` | DBA-approved files metadata-only projection |
-| `DBA_APPROVED_SECRET_REFERENCE` | Secret manager reference, no plaintext |
-| `DBA_APPROVED_ENDPOINT_ALIAS` | Sanitized endpoint/TNS alias |
-| `DBA_APPROVED_WALLET_REFERENCE` | Wallet/TLS reference, no content |
+| `DBA_APPROVED_PROJECTION_API` | public incremental projection surface |
+| `DBA_APPROVED_RUNTIME_PROGRESS_API` | deployed runtime progress surface |
+| `DBA_APPROVED_RESOURCE_PROJECTION` | resources projection |
+| `DBA_APPROVED_DEPENDENCY_PROJECTION` | dependency graph projection |
+| `DBA_APPROVED_VALUE_COST_PROJECTION` | value/cost projection |
+| `DBA_APPROVED_FILES_METADATA_PROJECTION` | files metadata-only projection |
+| `DBA_APPROVED_POOL_LIMITS` | pool min/max/increment/wait/statement cache |
 
 ## Run-Control And Idempotency
 
