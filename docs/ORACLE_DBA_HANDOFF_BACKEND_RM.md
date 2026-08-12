@@ -22,6 +22,8 @@ blocked outside the DBA physical v1 object-creation scope.
   `docs/ORACLE_DBA_PHYSICAL_HANDOFF_BACKEND_2026-08-12.md`.
 - Documental v1.1 read/grants delta for external approval:
   `docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`.
+- Vector DB / Knowledge app-wide boundary clarification:
+  `docs/ORACLE_VECTOR_KNOWLEDGE_APP_BOUNDARY_2026-08-12.md`.
 
 No application code path was deployed or connected to the new objects. No
 grants, deploy, restart, collection, Moinhos reprocessing, endpoint exposure, or
@@ -31,6 +33,8 @@ Server evidence confirms wallet material, driver presence, ADB connectivity, and
 successful creation of the approved `CA_DISC_LIFT_*` objects. BE real
 integration remains blocked because grants are absent and v1 has no read
 package for active projects, run projection/DTO, journal cursor, or artifacts.
+That blocker is specific to Lift operational persistence and does not globally
+block Vector DB / Knowledge / RAG as the application knowledge base.
 
 ## Backend Next Step
 

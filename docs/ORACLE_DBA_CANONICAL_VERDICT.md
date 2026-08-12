@@ -93,10 +93,17 @@ Required separation:
 
 - Use `CA_DISC_LIFT_*` object prefixes plus mandatory logical scope columns:
   `client_id`, `provider`, `environment`, and `project_id`.
-- Do not use `ca_knowledge_*`, vector indexes, or RAG storage as operational
-  source of truth for Discovery/Lift.
-- Treat Knowledge/RAG as a consumer or adjacent domain only when an explicit
-  contract says so.
+- Treat Vector DB / Knowledge / RAG as the shared knowledge base for the whole
+  application, not as a Lift-specific store.
+- Do not use `ca_knowledge_*`, vector indexes, or RAG storage as the
+  transactional source of truth for Discovery/Lift run-control, idempotency,
+  journal, active-project eligibility, artifacts, or DTO totals unless an
+  explicit cross-domain interface contract authorizes that use.
+- Knowledge/RAG may continue as an application-wide knowledge capability under
+  its own owner/contract.
+
+Detailed boundary:
+`docs/ORACLE_VECTOR_KNOWLEDGE_APP_BOUNDARY_2026-08-12.md`.
 
 ## Required DBA Physical Contract
 
