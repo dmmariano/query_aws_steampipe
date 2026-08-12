@@ -35,9 +35,11 @@ Allowed default-OFF claims:
 
 - DTO model for active projects.
 - DTO model for prepare-workplan response.
-- Active-projects adapter against `CA_DISC_LIFT_PROJECTS`.
-- Prepare-workplan service against `CA_DISC_LIFT_API`.
-- Append-only journal polling against `CA_DISC_LIFT_JOURNAL`.
+- Proposed active-projects adapter shape from
+  `docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`.
+- Prepare-workplan service scaffolding against existing `CA_DISC_LIFT_API`
+  write signatures.
+- Proposed journal polling DTO shape from the v1.1 read API delta.
 - Fake/in-memory stores for tests.
 - Deterministic idempotency for canonical `project_ids[]`.
 - Fail-closed scope validation before job creation.
@@ -46,6 +48,8 @@ Allowed default-OFF claims:
 
 Blocked claims:
 
+- Real read adapter until v1.1 read API/grants approval.
+- Direct SQL against `CA_DISC_LIFT_*` tables for missing read operations.
 - Grants.
 - Additional DDL.
 - Direct table DML outside `CA_DISC_LIFT_API`.

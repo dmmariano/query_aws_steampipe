@@ -1,6 +1,6 @@
 # Oracle DBA Handoff For Backend, RM, And Dispatcher
 
-Status: DBA_PHYSICAL_V1_EXECUTED / BACKEND_RM_PENDING
+Status: DBA_PHYSICAL_V1_EXECUTED / BE_REAL_BLOCKED_PENDING_V1_1
 
 This handoff records what is ready as sanitized architecture and what remains
 blocked outside the DBA physical v1 object-creation scope.
@@ -17,22 +17,26 @@ blocked outside the DBA physical v1 object-creation scope.
   Autonomous Database via the runtime connection alias `cloudarchdb_high`.
 - Backend physical handoff for the next implementation slice:
   `docs/ORACLE_DBA_PHYSICAL_HANDOFF_BACKEND_2026-08-12.md`.
+- Documental v1.1 read/grants delta for external approval:
+  `docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`.
 
 No application code path was deployed or connected to the new objects. No
 grants, deploy, restart, collection, Moinhos reprocessing, endpoint exposure, or
 real customer data access was performed.
 
 Server evidence confirms wallet material, driver presence, ADB connectivity, and
-successful creation of the approved `CA_DISC_LIFT_*` objects. Backend route/API,
-runtime pool configuration, DTO publication, and RM deploy remain pending.
+successful creation of the approved `CA_DISC_LIFT_*` objects. BE real
+integration remains blocked because grants are absent and v1 has no read
+package for active projects, run projection/DTO, journal cursor, or artifacts.
 
 ## Backend Next Step
 
-Backend may build the implementation using the approved physical contract:
+Backend may build pre-edit/default-OFF implementation using the approved
+physical contract:
 
 - Adapter interface.
 - DTO model.
-- Multi-project active-projects and prepare-workplan services.
+- Multi-project active-projects and prepare-workplan fake/pre-edit services.
 - Feature flag default OFF.
 - Fake Oracle tests plus integration code behind the default-OFF flag.
 - Idempotency/run-control mapping to `CA_DISC_LIFT_RUNS`,
@@ -44,6 +48,7 @@ Backend may build the implementation using the approved physical contract:
 
 Backend must stop before:
 
+- Real BE integration before v1.1 read API/grants approval.
 - Deploy/restart.
 - Additional DDL or grants.
 - Direct table DML from web handlers outside the approved package boundary.
@@ -70,13 +75,12 @@ for removing the same `CA_DISC_LIFT_*` objects if that rollback is requested.
 
 ## Dispatcher Next Step
 
-Dispatcher should move BE-ORA-WRITER/Lift out of DBA object-absence HOLD and
-assign:
+Dispatcher should keep BE real integration blocked and assign:
 
-- Backend owner for adapter/API implementation.
-- RM owner for later preflight after Backend candidate.
-- DBA owner for any additional hardening DDL, VPD/application context, grants,
-  or projection expansion.
+- Backend owner for default-OFF pre-edit adapter/API implementation.
+- DBA/Infra owner for v1.1 read API/grants approval.
+- RM owner for later preflight after v1.1 and Backend candidate.
+- DBA owner for VPD/application context roadmap and projection expansion.
 
 ## DBA/Infra Required Response
 

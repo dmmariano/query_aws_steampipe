@@ -307,10 +307,12 @@ hardening gap for any split-user or broader runtime access model.
 
 Backend may implement:
 
-- active-projects projection against `CA_DISC_LIFT_PROJECTS`;
-- prepare-workplan adapter against `CA_DISC_LIFT_API`;
+- default-OFF pre-edit DTO and adapter scaffolding;
+- prepare-workplan write-path scaffolding against existing `CA_DISC_LIFT_API`
+  signatures;
 - DTO model and JSON schema validation;
-- journal polling against `CA_DISC_LIFT_JOURNAL`;
+- proposed v1.1 read API DTOs from
+  `docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`;
 - in-memory/fake path for tests;
 - deterministic idempotency for synthetic inputs;
 - feature flag default OFF;
@@ -320,6 +322,8 @@ Backend may implement:
 
 Backend must not implement:
 
+- real read adapter before v1.1 read API/grants approval;
+- direct SQL against `CA_DISC_LIFT_*` tables for missing read operations;
 - deploy/restart without RM;
 - additional DDL/grants;
 - direct table DML from web handlers outside `CA_DISC_LIFT_API`;
@@ -341,6 +345,7 @@ Completed for Oracle physical v1:
 
 Remaining gaps:
 
+- v1.1 read API/grants approval for real BE integration.
 - Backend route/API and DTO publication.
 - Public run status/projection endpoint.
 - Pool limits and circuit breaker implementation.

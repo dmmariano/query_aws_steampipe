@@ -2,11 +2,18 @@
 
 Date: 2026-08-12
 
-Status: DBA_PHYSICAL_V1_READY / BE_API_PENDING
+Status: DBA_PHYSICAL_V1_READY / BE_REAL_BLOCKED_PENDING_V1_1
 
 Document package ref: `0519aa4198a1a15fbacf53f01b2c5588329ebfd2`
 
 Scope: Discovery/Lift multi-cloud Workplan pre-edit and server-side integration.
+
+Superseding pre-edit delta for real BE integration:
+`docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`.
+
+Important: physical v1 does not unblock BE real integration by itself. Grants
+are absent and the package does not expose active-projects read, run
+projection/DTO, journal cursor, or artifact read operations.
 
 This handoff is sanitized. It does not expose user, password, wallet content,
 full DSN descriptor, schema owner, customer data, OCIDs, object-storage paths, or
@@ -361,8 +368,8 @@ release rollback decision. Default runtime rollback is logical by `run_id` and
 
 Allowed:
 
-- wire a server-side adapter to `CA_DISC_LIFT_API` only for existing package
-  procedures;
+- prepare a server-side adapter to `CA_DISC_LIFT_API` only for existing package
+  procedures, default OFF;
 - keep feature flag default `OFF`;
 - implement DTO models and fake tests;
 - implement fail-closed request validation;
@@ -371,6 +378,7 @@ Allowed:
 
 Blocked:
 
+- BE real integration until v1.1 read API/grants are approved;
 - new DDL/DML;
 - grants;
 - deploy/restart;

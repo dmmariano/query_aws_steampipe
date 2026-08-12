@@ -12,17 +12,17 @@ the current Autonomous Database.
 | Domain | Logical contract | Physical status |
 |---|---|---|
 | Tenant scope | `client_id`, `project_id`, `provider`, `environment` | READY_CA_DISC_LIFT_V1 |
-| Active projects | selectable project registry | READY_CA_DISC_LIFT_V1 |
+| Active projects | selectable project registry | TABLE_READY / READ_API_PENDING_V1_1 |
 | Run-control | run lifecycle and batch lifecycle | READY_CA_DISC_LIFT_V1 |
 | Writer | metadata-only run/event/artifact package API | READY_CA_DISC_LIFT_V1 |
 | Journal | append-only run/event log | READY_CA_DISC_LIFT_V1 |
-| Projection | incremental read model by scope and cursor | PENDING_BACKEND_API |
-| DTO | public sanitized Lift payload | PENDING_BACKEND_API |
+| Projection | incremental read model by scope and cursor | READ_API_PENDING_V1_1 |
+| DTO | public sanitized Lift payload | READ_API_PENDING_V1_1 |
 | Resources | inventory resources read model | PENDING_DBA |
 | Dependencies | account-account, app-app, app-database graph | PENDING_DBA |
 | Value/cost | aggregated value and cost metrics | PENDING_DBA |
 | Files | metadata-only file records, no content | PENDING_DBA |
-| Progress/events | runtime progress and public state | PARTIAL_CA_DISC_LIFT_JOURNAL |
+| Progress/events | runtime progress and public state | JOURNAL_TABLE_READY / READ_API_PENDING_V1_1 |
 
 ## Physical Contract V1
 
@@ -42,6 +42,9 @@ tablespace was not changed.
 | `CA_DISC_LIFT_API` | approved package boundary for run/event/artifact writes |
 
 Endpoint alias: `cloudarchdb_high`.
+
+Read API delta for external approval:
+`docs/ORACLE_DBA_DELTA_V1_1_READ_API_PREEDIT_2026-08-12.md`.
 
 ## Remaining Placeholder Contracts
 

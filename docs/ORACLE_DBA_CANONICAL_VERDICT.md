@@ -1,6 +1,6 @@
 # Oracle DBA / Data Architecture Canonical Verdict
 
-Status: PARTIAL
+Status: PARTIAL / BE_REAL_BLOCKED_PENDING_V1_1
 
 This is the canonical Oracle DBA/Data Architecture position for the
 Cloud Architect Discovery/Lift Oracle-first workstream. It records the
@@ -37,9 +37,9 @@ Still does not authorize:
 | Physical schema | Connected runtime schema in the current Autonomous Database |
 | Tablespace | Not changed, not required for this approval |
 | Physical names | `CA_DISC_LIFT_PROJECTS`, `CA_DISC_LIFT_RUNS`, `CA_DISC_LIFT_JOURNAL`, `CA_DISC_LIFT_ARTIFACTS`, `CA_DISC_LIFT_API`, approved indexes |
-| Backend allowed now | Real adapter preparation against approved package/object contract, feature-gated/default OFF |
+| Backend allowed now | Pre-edit/default-OFF adapter preparation only |
 | Runtime Oracle pool | PENDING_BACKEND_RM |
-| Real integration | PENDING_BACKEND_RM_DEPLOY |
+| Real integration | BLOCKED_PENDING_V1_1_READ_API_AND_GRANTS |
 | Data operations | No customer-content read or Moinhos reprocessing without separate workflow authorization |
 
 ## Server-Side Evidence Summary
@@ -111,7 +111,8 @@ Remaining DBA/Architecture gaps:
 
 - VPD/application-context policy is not created.
 - Grants are not created because runtime currently uses the connected schema.
-- Public projection/read procedures are still a Backend/API contract gap.
+- Public projection/read procedures are missing from `CA_DISC_LIFT_API`.
+- v1.1 read package/grants delta is required before BE real integration.
 - Resources, dependency graph, value/cost, files metadata, and runtime progress
   domain producers are not populated.
 - Operational pool limits must be implemented by Backend/RM.
@@ -121,8 +122,8 @@ Remaining DBA/Architecture gaps:
 
 Backend may now implement:
 
-- Adapter and DTO code against `CA_DISC_LIFT_API`, behind feature flag default
-  OFF until RM approval.
+- Pre-edit adapter and DTO code against documented v1/v1.1 contracts, behind
+  feature flag default OFF.
 - Fake Oracle tests and fixtures with no real credentials or customer data.
 - Sanitized JSON contracts.
 - Fail-closed guards before pool/query/write.
@@ -137,6 +138,7 @@ Backend must not implement:
 - Runtime deploy without RM.
 - Customer-content reads or Moinhos reprocessing without explicit workflow
   authorization.
+- Real read adapter until v1.1 read API and grants are approved.
 
 ## RM / Dispatcher Boundary
 
