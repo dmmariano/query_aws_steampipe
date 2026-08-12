@@ -2,6 +2,9 @@
 
 Status: DBA_PHYSICAL_V1_EXECUTED / BE_REAL_BLOCKED_PENDING_V1_1
 
+Provenance for this handoff: Git candidate documentation. Runtime/DB validation
+must be reissued from `oracle-ai` before operational use.
+
 This handoff records what is ready as sanitized architecture and what remains
 blocked outside the DBA physical v1 object-creation scope.
 

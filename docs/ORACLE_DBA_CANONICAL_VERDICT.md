@@ -2,6 +2,10 @@
 
 Status: PARTIAL / BE_REAL_BLOCKED_PENDING_V1_1
 
+Provenance for this document: Git candidate documentation. Runtime/DB evidence
+must be revalidated on `oracle-ai` before this is treated as an operational
+handoff.
+
 This is the canonical Oracle DBA/Data Architecture position for the
 Cloud Architect Discovery/Lift Oracle-first workstream. It records the
 sanitized logical contract and the approved Oracle physical base created for
@@ -150,5 +154,5 @@ RM may proceed to a deploy review only after all are true:
 - Pool limits, healthcheck method, rollback, and default-OFF feature gate are
   present without exposing secret content.
 
-Dispatcher should move this from DBA physical HOLD to Backend/RM implementation
-pending.
+Dispatcher should keep BE real integration blocked until v1.1 read API/grants
+approval and separate oracle-ai validation are available.

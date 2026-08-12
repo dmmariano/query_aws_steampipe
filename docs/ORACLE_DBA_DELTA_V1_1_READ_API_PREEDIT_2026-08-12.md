@@ -4,6 +4,9 @@ Date: 2026-08-12
 
 Status: DOCUMENTAL_PRE_EDIT_ONLY / EXTERNAL_APPROVAL_REQUIRED
 
+Provenance: Git candidate documentation only. Runtime/DB validation remains a
+separate oracle-ai activity and is not performed by this delta.
+
 Base package ref: `704bdcf6bc54e63b15ebf4263bffc533e718d444`
 
 Prior execution ref: `0519aa4198a1a15fbacf53f01b2c5588329ebfd2`

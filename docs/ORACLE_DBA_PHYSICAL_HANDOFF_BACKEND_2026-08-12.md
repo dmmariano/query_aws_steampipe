@@ -4,6 +4,10 @@ Date: 2026-08-12
 
 Status: DBA_PHYSICAL_V1_READY / BE_REAL_BLOCKED_PENDING_V1_1
 
+Provenance for Backend consumption: Git candidate documentation. Treat runtime
+and DB evidence as requiring separate oracle-ai revalidation before operational
+use.
+
 Document package ref: `0519aa4198a1a15fbacf53f01b2c5588329ebfd2`
 
 Scope: Discovery/Lift multi-cloud Workplan pre-edit and server-side integration.
