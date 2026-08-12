@@ -13,6 +13,7 @@ Applies to:
 
 - BE-ORA-WRITER / Discovery Oracle-first.
 - Lift/Moinhos server-side consumer.
+- Lift multi-project Workplan preparation, tracked as `#203`.
 - Writer, journal, projection/API incremental, DTOs, run-control, grants,
   pool, healthcheck, and data governance.
 
@@ -53,6 +54,20 @@ Read-only server inspection on 2026-08-11 confirmed:
 
 Detailed sanitized evidence is recorded in
 `docs/ORACLE_SERVER_READONLY_EVIDENCE_2026-08-11.md`.
+
+## Lift Multi-Project Addendum
+
+The `Preparar Workplan` multi-project flow is a logical extension only. It
+requires `client_id`, `provider`, and `project_ids[]` as server input and must
+return a server-computed DTO with `run_id`, `idempotency_key`, status, counts,
+opaque artifact refs, approval, and journal cursor.
+
+The UI/renderer must not sum project data, infer project eligibility, read local
+artifacts, or reprocess Moinhos. It may only submit selected project ids and
+display the server projection.
+
+Detailed contract is recorded in
+`docs/ORACLE_LIFT_MULTI_PROJECT_WORKPLAN_CONTRACT_V1.md`.
 
 ## Canonical Architecture Position
 

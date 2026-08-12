@@ -9,6 +9,7 @@ blocked by DBA/Infra.
 
 - Canonical DBA/Data Architecture verdict.
 - Logical Discovery/Lift Oracle contract v1.
+- Logical Lift multi-project Workplan addendum v1 for `#203`.
 - JSON schema for validating sanitized contract payloads.
 - Server-side read-only evidence record for hosted Oracle readiness.
 
@@ -28,6 +29,7 @@ contract:
 
 - Adapter interface.
 - DTO model.
+- Multi-project active-projects and prepare-workplan fake services.
 - Feature flag default OFF.
 - Fake Oracle tests.
 - Idempotency/run-control simulation.
@@ -41,6 +43,7 @@ Backend must stop before:
 - Real pool.
 - Real writer call.
 - Real journal/projection.
+- Real Workload Builder or Workplan generation for Moinhos.
 - Secret, wallet, endpoint, schema, grant, DDL, DML, or deploy.
 
 ## RM Next Step
