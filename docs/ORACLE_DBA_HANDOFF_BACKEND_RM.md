@@ -12,6 +12,7 @@ blocked by DBA/Infra.
 - Logical Lift multi-project Workplan addendum v1 for `#203`.
 - JSON schema for validating sanitized contract payloads.
 - Server-side read-only evidence record for hosted Oracle readiness.
+- Physical DDL and rollback scripts for DBA/RM approval, not executed.
 
 No code path was connected to Oracle. No DDL, DML, grants, deploy, restart,
 collection, reprocessing, secret read, wallet read, endpoint exposure, or real
@@ -58,6 +59,9 @@ RM must keep deploy blocked until Backend returns a candidate with:
 - Contract proving DBA/Infra physical approval.
 - Secret reference, wallet/TLS, endpoint alias, pool limits, and healthcheck
   method without plaintext.
+
+Physical DDL scripts are available under `db/oracle/` for explicit DBA/RM
+approval. They must not be run as an implicit consequence of this handoff.
 
 ## Dispatcher Next Step
 
