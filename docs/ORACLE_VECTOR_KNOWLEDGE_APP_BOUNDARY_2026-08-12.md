@@ -1,4 +1,4 @@
-# Oracle Vector Knowledge Application Boundary
+# Oracle Vector / Knowledge Boundary Within Autonomous
 
 Date: 2026-08-12
 
@@ -9,10 +9,15 @@ separate oracle-ai activity.
 
 ## Position
 
-The Vector DB / Knowledge / RAG domain is the shared knowledge base for the
-Cloud Architect application. It is not exclusive to Lift and must not be blocked
-as a platform capability just because the Lift operational contract is missing
-read APIs or grants.
+Autonomous Database is the shared multimodal knowledge base for the Cloud
+Architect application. Vector DB / Knowledge / RAG is one capability set inside
+that Autonomous platform, not the whole platform and not a Lift-exclusive store.
+
+Canonical broader contract:
+`docs/ORACLE_AUTONOMOUS_APPLICATION_KNOWLEDGE_BASE_CONTRACT_2026-08-12.md`.
+
+Vector/RAG must not be blocked as a platform capability just because the Lift
+operational contract is missing read APIs or grants.
 
 ## Boundary
 
@@ -24,6 +29,10 @@ Allowed as application knowledge capability:
 - cross-application context;
 - derived explanations and recommendations;
 - consumer-facing knowledge views when authorized by the Knowledge/RAG contract.
+
+Other Autonomous capabilities such as relational transactions, JSON/SODA,
+property/RDF graph, spatial, SQL analytics, and Select AI are governed by the
+broader multimodal contract, not by this Vector/RAG boundary alone.
 
 Not allowed as Lift operational source of truth without an explicit interface
 contract:

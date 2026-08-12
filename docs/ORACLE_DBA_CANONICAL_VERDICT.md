@@ -16,6 +16,8 @@ evidence of production data.
 
 Applies to:
 
+- Autonomous Database as the multimodal application knowledge and data
+  intelligence foundation.
 - BE-ORA-WRITER / Discovery Oracle-first.
 - Lift/Moinhos server-side consumer.
 - Lift multi-project Workplan preparation, tracked as `#203`.
@@ -89,12 +91,18 @@ The first physical contract uses the connected runtime schema in the same
 Autonomous Database. Schema is a logical namespace/owner; tablespace is storage
 allocation. No tablespace change was requested or performed.
 
+The broader target architecture is Autonomous Database as the application-wide
+multimodal knowledge base: relational/transactional, JSON/document, vector,
+graph, spatial, SQL analytics, and governed RAG/Select AI surfaces under
+explicit contracts.
+
 Required separation:
 
 - Use `CA_DISC_LIFT_*` object prefixes plus mandatory logical scope columns:
   `client_id`, `provider`, `environment`, and `project_id`.
-- Treat Vector DB / Knowledge / RAG as the shared knowledge base for the whole
-  application, not as a Lift-specific store.
+- Treat Autonomous DB / Knowledge / RAG / Vector / Graph / JSON / Spatial as the
+  shared multimodal knowledge base for the whole application, not as a
+  Lift-specific store.
 - Do not use `ca_knowledge_*`, vector indexes, or RAG storage as the
   transactional source of truth for Discovery/Lift run-control, idempotency,
   journal, active-project eligibility, artifacts, or DTO totals unless an
@@ -103,6 +111,7 @@ Required separation:
   its own owner/contract.
 
 Detailed boundary:
+`docs/ORACLE_AUTONOMOUS_APPLICATION_KNOWLEDGE_BASE_CONTRACT_2026-08-12.md` and
 `docs/ORACLE_VECTOR_KNOWLEDGE_APP_BOUNDARY_2026-08-12.md`.
 
 ## Required DBA Physical Contract
