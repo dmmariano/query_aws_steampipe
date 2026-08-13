@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "oracle_discovery_lift_logical_contract_v1.schema.json",
+  "title": "Oracle Discovery/Lift Logical Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "verdict",
+    "authorization",
+    "tenant_scope",
+    "run_control",
+    "surfaces",
+    "grants",
+    "isolation",
+    "operational_limits",
+    "healthcheck",
+    "backend_boundary"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "oracle-discovery-lift-logical-v1"
+    },
+    "verdict": {
+      "enum": ["HOLD", "PARTIAL", "READY"]
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "autonomous_authorized_for_discovery_lift",
+        "physical_contract_status",
+        "secret_plaintext_allowed",
+        "ddl_dml_grants_allowed"
+      ],
+      "properties": {
+        "autonomous_authorized_for_discovery_lift": {
+          "enum": ["NOT_CONFIRMED", "APPROVED", "REJECTED"]
+        },
+        "physical_contract_status": {
+          "enum": ["MISSING", "DBA_APPROVED", "DBA_EXECUTED"]
+        },
+        "secret_plaintext_allowed": {
+          "const": false
+        },
+        "ddl_dml_grants_allowed": {
+          "const": false
+        }
+      }
+    },
+    "tenant_scope": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "client_id" },
+        { "const": "project_id" },
+        { "const": "provider" },
+        { "const": "environment" }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "run_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fields", "states", "rollback_mode"],
+      "properties": {
+        "fields": {
+          "type": "array",
+          "contains": { "const": "idempotency_key" },
+          "items": {
+            "enum": [
+              "run_id",
+              "batch_id",
+              "event_id",
+              "event_sequence",
+              "client_id",
+              "project_id",
+              "provider",
+              "environment",
+              "idempotency_key",
+              "source_fingerprint",
+              "payload_digest",
+              "projection_cursor",
+              "observed_at",
+              "committed_at",
+              "rollback_run_marker"
+            ]
+          }
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "BATCH_COMMITTED",
+              "COMMITTED",
+              "EMPTY",
+              "FAILED_RETRYABLE",
+              "FAILED_FINAL",
+              "CANCELLED",
+              "ROLLED_BACK"
+            ]
+          }
+        },
+        "rollback_mode": {
+          "const": "logical_by_run_without_destructive_delete"
+        }
+      }
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "writer",
+        "journal",
+        "projection",
+        "dto",
+        "resources",
+        "dependencies",
+        "value_cost",
+        "files_metadata",
+        "runtime_progress"
+      ],
+      "properties": {
+        "writer": { "$ref": "#/$defs/surface" },
+        "journal": { "$ref": "#/$defs/surface" },
+        "projection": { "$ref": "#/$defs/surface" },
+        "dto": { "$ref": "#/$defs/surface" },
+        "resources": { "$ref": "#/$defs/surface" },
+        "dependencies": { "$ref": "#/$defs/surface" },
+        "value_cost": { "$ref": "#/$defs/surface" },
+        "files_metadata": { "$ref": "#/$defs/surface" },
+        "runtime_progress": { "$ref": "#/$defs/surface" }
+      }
+    },
+    "grants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_write", "runtime_read", "ddl_allowed"],
+      "properties": {
+        "runtime_write": {
+          "enum": ["EXECUTE_ONLY_ON_DBA_APPROVED_API", "EXECUTE_ON_CA_DISC_LIFT_API", "PENDING_DBA"]
+        },
+        "runtime_read": {
+          "enum": ["SELECT_ONLY_ON_DBA_APPROVED_PROJECTIONS", "SELECT_ON_CA_DISC_LIFT_APPROVED_OBJECTS", "PENDING_DBA"]
+        },
+        "ddl_allowed": {
+          "const": false
+        }
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "fail_closed_before_query_or_write"],
+      "properties": {
+        "mode": {
+          "enum": ["VPD", "APPLICATION_CONTEXT", "STORED_API_VALIDATION", "DBA_APPROVED_EQUIVALENT", "PENDING_DBA"]
+        },
+        "fail_closed_before_query_or_write": {
+          "const": true
+        }
+      }
+    },
+    "operational_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batch_size",
+        "page_size",
+        "statement_timeout_ms",
+        "connect_timeout_ms",
+        "pool_min",
+        "pool_max",
+        "pool_increment",
+        "pool_wait_timeout_ms",
+        "statement_cache_size"
+      ],
+      "properties": {
+        "batch_size": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "page_size": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "statement_timeout_ms": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "connect_timeout_ms": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "pool_min": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "pool_max": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "pool_increment": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "pool_wait_timeout_ms": { "$ref": "#/$defs/dbaApprovedNumber" },
+        "statement_cache_size": { "$ref": "#/$defs/dbaApprovedNumber" }
+      }
+    },
+    "healthcheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_levels", "query_real_data_allowed"],
+      "properties": {
+        "allowed_levels": {
+          "type": "array",
+          "items": {
+            "enum": ["config_only", "import_only", "wallet_metadata", "pool_config_parse", "dual_readonly"]
+          }
+        },
+        "query_real_data_allowed": {
+          "const": false
+        }
+      }
+    },
+    "backend_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fake_only_allowed", "feature_flag_default", "real_integration_allowed"],
+      "properties": {
+        "fake_only_allowed": {
+          "type": "boolean"
+        },
+        "feature_flag_default": {
+          "const": "OFF"
+        },
+        "real_integration_allowed": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "physical_name"],
+      "properties": {
+        "status": {
+          "enum": ["PENDING_DBA", "DBA_APPROVED", "DBA_EXECUTED"]
+        },
+        "physical_name": {
+          "type": "string",
+          "pattern": "^(DBA_APPROVED_|PENDING_DBA|CA_DISC_LIFT_).+"
+        }
+      }
+    },
+    "dbaApprovedNumber": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "pattern": "^DBA_APPROVED_.+"
+        }
+      ]
+    }
+  }
+}
