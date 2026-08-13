@@ -21,6 +21,8 @@ Applies to:
 - BE-ORA-WRITER / Discovery Oracle-first.
 - Lift/Moinhos server-side consumer.
 - Lift multi-project Workplan preparation, tracked as `#203`.
+- Productive Discovery Resources API, tracked as `#188`.
+- Productive Discovery Property Graph, tracked as `#189`.
 - Writer, journal, projection/API incremental, DTOs, run-control, grants,
   pool, healthcheck, and data governance.
 
@@ -114,6 +116,9 @@ Detailed boundary:
 `docs/ORACLE_AUTONOMOUS_APPLICATION_KNOWLEDGE_BASE_CONTRACT_2026-08-12.md` and
 `docs/ORACLE_VECTOR_KNOWLEDGE_APP_BOUNDARY_2026-08-12.md`.
 
+Discovery productive #188/#189 boundary:
+`docs/ORACLE_DISCOVERY_PRODUCTIVE_188_189_PREEDIT_CONTRACT_2026-08-13.md`.
+
 ## Required DBA Physical Contract
 
 The approved v1 physical contract contains:
@@ -133,8 +138,14 @@ Remaining DBA/Architecture gaps:
 - Grants are not created because runtime currently uses the connected schema.
 - Public projection/read procedures are missing from `CA_DISC_LIFT_API`.
 - v1.1 read package/grants delta is required before BE real integration.
-- Resources, dependency graph, value/cost, files metadata, and runtime progress
-  domain producers are not populated.
+- Productive Discovery Resources API #188 is missing physical object/package,
+  grants, VPD/app-context, run-control, provisional-resource staging,
+  idempotency, single-flight, atomic publication, and audit contracts.
+- Productive Discovery Property Graph #189 is missing physical graph/query
+  contract, DependencySnapshot publication contract, grants, and read DTO
+  contract.
+- Value/cost, files metadata, and runtime progress domain producers are not
+  populated for productive Discovery.
 - Operational pool limits must be implemented by Backend/RM.
 - Any hardening DDL beyond this v1 object list requires a new explicit gate.
 
